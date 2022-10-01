@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 
-const {createDatabase, createTables, login, getOffices, logout, getOfficeUsers} = require("./database");
+const {createDatabase, createTables, login, getOffices, logout, getOfficeUsers, getAmenities} = require("./database");
 
 createDatabase().then((result) => {
   if (result) {
@@ -28,6 +28,37 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 
 app.get('/api/amenities/:office', cors(), async(req, res, next) => {
+  const office = req.params.office;
+
+  getAmenities(office).then((result) => {
+    if (result === undefined) {
+      res.json({success: false, message: "Database Error"});
+      return;
+    }
+
+    let body = {
+      success: true,
+      amenities: []
+    };
+    for (let i = 0; i < result.rowCount; i++) {
+      if (i !== 0 && result.rows[i].a_id === result.rows[i-1].a_id) {
+        body.amenities[body.amenities.length - 1].people.push(result.rows[i].u_name);
+      } else {
+        const r = result.rows[i];
+        body.amenities.push({
+          id: r.a_id,
+          name: r.a_name,
+          room: r.r_name,
+          image: r.image,
+          capacity: r.capacity,
+          people: [r.u_name]
+        });
+      }
+    }
+    console.log(body);
+    res.json(body);
+  });
+
   try {
     res.json({amenities: [
         {

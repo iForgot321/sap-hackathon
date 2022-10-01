@@ -181,8 +181,23 @@ module.exports.getOfficeUsers = async (office) => {
     }
 }
 
-module.exports.getAmenities = async () => {
-
+module.exports.getAmenities = async (office) => {
+    const clientDB = await pool.connect();
+    try {
+        console.log("getting list of amenities");
+        const query = `SELECT a.id as a_id, a.name as a_name, r.name as r_name, a.image_url as image, a.capacity as capacity, u.name as u_name
+    FROM amenities a LEFT JOIN rooms r ON a.room_id=r.room_id 
+    LEFT JOIN users u ON a.amenity_id=u.amenity_id
+    LEFT JOIN offices o ON r.office_id=o.office_id WHERE o.office_id=\'${office}\'';`;
+        console.log(query);
+        const result = await clientDB.query(query);
+        return result;
+    } catch (error) {
+        console.error(error.stack);
+        return undefined;
+    } finally {
+        clientDB.release();
+    }
 }
 
 
