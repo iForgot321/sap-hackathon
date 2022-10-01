@@ -54,7 +54,8 @@ app.get('/api/amenities', cors(), async(req, res, next) => {
 app.post('/api/login', cors(), async(req, res, next) => {
   try {
     const uname = req.body.uname;
-    res.json({success: true, login: true, uname: uname});
+    const office = req.body.office;
+    res.json({success: true, login: true, uname: uname, office: office});
   } catch (err) {
     next(err)
   }
@@ -63,7 +64,8 @@ app.post('/api/login', cors(), async(req, res, next) => {
 app.post('/api/logout', cors(), async(req, res, next) => {
   try {
     const uname = req.body.uname;
-    res.json({success: true, logout: true, uname: uname});
+    const office = req.body.office;
+    res.json({success: true, logout: true, uname: uname, office: office});
   } catch (err) {
     next(err)
   }

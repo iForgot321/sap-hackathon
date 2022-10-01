@@ -1,11 +1,14 @@
 import React, {Component} from 'react'
+import './LoginApp.css'
 import ViewPage from "./ViewPage";
 
 class LoginApp extends Component {
   state = {
     uname: '',
+    loggedIn: false,
     office: '',
-    possibleOffices: '',
+    error: '',
+    possibleOffices: [],
     text: ''
   };
 
@@ -17,24 +20,31 @@ class LoginApp extends Component {
     const response = await fetch(`/api/offices`);
     const responseJson = await response.json();
     const offices = responseJson.offices;
-    this.setState({ ...this.state, possibleOffices: offices });
-    console.log(this.state.possibleOffices);
+    this.setState({ possibleOffices: offices, office: offices[0] });
   };
 
   logIn = async evt => {
     evt.preventDefault();
     const text = this.state.text;
+    if (this.state.text === '') {
+      this.setState({error: "Please provide a company email."});
+      return;
+    }
     const requestOptions = {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-          uname: text
+          uname: text,
+          office: this.state.office
       }
       )};
     const response = await fetch('/api/login/', requestOptions);
-    const custom = await response.json();
-    const uname = custom.uname;
-    this.setState({uname, text: ''})
+    const responseJson = await response.json();
+    if (responseJson.success && responseJson.login) {
+      this.setState({uname: responseJson.uname, text: '', loggedIn: true});
+    } else {
+      alert("O NO");
+    }
   };
 
   logOut = async evt => {
@@ -49,40 +59,50 @@ class LoginApp extends Component {
       )};
     const response = await fetch('/api/logout/', requestOptions);
     const custom = await response.json();
-    console.log(custom.success);
     if (custom.success) {
-      this.setState({uname: '', text: ''})
+      this.setState({uname: '', text: '', loggedIn: false});
+    } else {
+      alert("O NO");
     }
   };
 
   handleChange = evt => {
-    this.setState({[evt.target.name]: evt.target.value})
+    this.setState({[evt.target.name]: evt.target.value});
+    if (evt.target.name === "text") {
+      this.setState({error: ""});
+    }
   };
 
   render() {
-    if (this.state.uname === '') {
+    if (!this.state.loggedIn) {
       return (
         <div className="LoginApp">
-          <h3>Login</h3>
+          <h3>[name of app]</h3>
           <form onSubmit={this.logIn}>
-            <label>Username:</label>
             <input
               type="text"
               name="text"
+              placeholder="Company Email"
               value={this.state.text}
               onChange={this.handleChange}
             />
-            <button type="submit">Login</button>
+            <select className="officeDropdown" name="office" onChange={this.handleChange}>
+              {
+                this.state.possibleOffices.map((name) => <option value={name} key={name}>{name}</option>)
+              }
+            </select>
+            <button className="loginButton" type="submit">Sign in</button>
           </form>
+          <text className="errorText">{this.state.error}</text>
         </div>
       );
     } else {
       return (
         <div className="LoginApp">
-          <h3>Welcome: {this.state.uname}</h3>
+          <h3>Welcome: {this.state.uname} to office {this.state.office}</h3>
           <ViewPage />
           <form onSubmit={this.logOut}>
-            <button type="submit">Logout</button>
+            <button className="logoutButton" type="submit">Logout</button>
           </form>
         </div>
       )
