@@ -18,6 +18,7 @@ app.get('/api/amenities', cors(), async(req, res, next) => {
           'id': 1,
           'name': 'Pool Table 1',
           'room': 'Game Room',
+          'image': 'https://www.homestratosphere.com/wp-content/uploads/2018/05/game-room-billiards-table-may16-2018.jpg',
           'capacity': 2,
           'people': [
             {
@@ -35,6 +36,7 @@ app.get('/api/amenities', cors(), async(req, res, next) => {
           'id': 2,
           'name': 'Pool Table 2',
           'room': 'Game Room',
+          'image': 'https://www.homestratosphere.com/wp-content/uploads/2018/05/game-room-billiards-table-may16-2018.jpg',
           'capacity': 2,
           'people': [],
         },
@@ -42,6 +44,15 @@ app.get('/api/amenities', cors(), async(req, res, next) => {
           'id': 3,
           'name': 'Treadmill',
           'room': 'Gym',
+          'image': 'https://www.yanrefitness.com/wp-content/webpc-passthru.php?src=https://www.yanrefitness.com/wp-content/uploads/2020/09/How-to-Start-a-Corporate-Gym-1.jpg&nocache=1',
+          'capacity': 1,
+          'people': [],
+        },
+        {
+          'id': 4,
+          'name': 'Ping Pong Table 1',
+          'room': 'Gym',
+          'image': 'https://www.yanrefitness.com/wp-content/webpc-passthru.php?src=https://www.yanrefitness.com/wp-content/uploads/2020/09/How-to-Start-a-Corporate-Gym-1.jpg&nocache=1',
           'capacity': 1,
           'people': [],
         },
