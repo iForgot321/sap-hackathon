@@ -4,6 +4,9 @@ import AmenitiesList from "./AmenitiesList";
 import PeopleList from "./PeopleList";
 
 class LoginApp extends Component {
+  STORED_USERNAME_KEY = 'uname';
+  STORED_OFFICE_KEY = 'office';
+
   state = {
     uname: '',
     loggedIn: false,
@@ -13,8 +16,17 @@ class LoginApp extends Component {
     text: ''
   };
 
-  componentDidMount() {
-    this.fetchOffices()
+  async componentDidMount() {
+    this.fetchExistingSession()
+    await this.fetchOffices()
+  }
+
+  fetchExistingSession = () => {
+    const existingUsername = localStorage.getItem(this.STORED_USERNAME_KEY);
+    const existingOffice = localStorage.getItem(this.STORED_OFFICE_KEY);
+    if (existingUsername && existingOffice) {
+      this.setState({uname: existingUsername, text: '', loggedIn: true, office: existingOffice});
+    }
   }
 
   fetchOffices = async () => {
@@ -43,6 +55,8 @@ class LoginApp extends Component {
     const responseJson = await response.json();
     if (responseJson.success && responseJson.login) {
       this.setState({uname: responseJson.uname, text: '', loggedIn: true});
+      localStorage.setItem(this.STORED_USERNAME_KEY, responseJson.uname);
+      localStorage.setItem(this.STORED_OFFICE_KEY, this.state.office);
     } else {
       alert("O NO");
     }
@@ -62,6 +76,8 @@ class LoginApp extends Component {
     const custom = await response.json();
     if (custom.success) {
       this.setState({uname: '', text: '', loggedIn: false});
+      localStorage.removeItem(this.STORED_USERNAME_KEY);
+      localStorage.removeItem(this.STORED_OFFICE_KEY);
     } else {
       alert("O NO");
     }
