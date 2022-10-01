@@ -36,7 +36,7 @@ app.get('*', (req, res) => {
 })
 
 // Choose the port and start the server
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 7777
 app.listen(PORT, () => {
   console.log(`Mixing it up on port ${PORT}`)
 })
