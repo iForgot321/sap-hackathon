@@ -67,7 +67,7 @@ let amenities = [
     'id': 4,
     'name': 'Ping Pong Table 1',
     'room': 'Gym',
-    'image': 'https://www.yanrefitness.com/wp-content/webpc-passthru.php?src=https://www.yanrefitness.com/wp-content/uploads/2020/09/How-to-Start-a-Corporate-Gym-1.jpg&nocache=1',
+    // 'image': 'https://www.yanrefitness.com/wp-content/webpc-passthru.php?src=https://www.yanrefitness.com/wp-content/uploads/2020/09/How-to-Start-a-Corporate-Gym-1.jpg&nocache=1',
     'capacity': 2,
     'people': [
       {
