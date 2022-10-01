@@ -40,11 +40,13 @@ class PeopleList extends Component {
         </div>
         <small>View everyone presently in the office</small>
         <hr/>
-        {
-          this.state.displayedPeople.map((person) => (
-            <Person key={person.id} person={person}/>
-          ))
-        }
+        <div className="overflow-scroll" style={{height: "27em"}}>
+          {
+            this.state.displayedPeople.map((person) => (
+              <Person key={person.id} person={person}/>
+            ))
+          }
+        </div>
       </div>
     );
   }
