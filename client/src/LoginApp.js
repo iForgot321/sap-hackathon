@@ -4,13 +4,34 @@ import './LoginApp.css'
 class LoginApp extends Component {
   state = {
     uname: '',
+    office: '',
+    possibleOffices: '',
     text: ''
+  };
+
+  componentDidMount() {
+    this.fetchOffices()
+  }
+
+  fetchOffices = async () => {
+    const response = await fetch(`/api/offices`);
+    const responseJson = await response.json();
+    const offices = responseJson.offices;
+    this.setState({ ...this.state, possibleOffices: offices });
+    console.log(this.state.possibleOffices);
   };
 
   logIn = async evt => {
     evt.preventDefault();
     const text = this.state.text;
-    const response = await fetch(`/api/login/${text}`);
+    const requestOptions = {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+          uname: text
+      }
+      )};
+    const response = await fetch('/api/login/', requestOptions);
     const custom = await response.json();
     const uname = custom.uname;
     this.setState({uname, text: ''})
@@ -18,7 +39,15 @@ class LoginApp extends Component {
 
   logOut = async evt => {
     evt.preventDefault();
-    const response = await fetch(`/api/logout/${this.state.uname}`);
+
+    const requestOptions = {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+          uname: this.state.uname
+        }
+      )};
+    const response = await fetch('/api/logout/', requestOptions);
     const custom = await response.json();
     console.log(custom.success);
     if (custom.success) {

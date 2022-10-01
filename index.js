@@ -1,26 +1,37 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-
+const bodyParser = require('body-parser')
 // Create the server
 const app = express();
 
+const offices = ["Vancouver", "Vancouver, Washington"];
+
 // Serve static files from the React frontend app
 app.use(express.static(path.join(__dirname, 'client/build')));
+app.use( bodyParser.json() );       // to support JSON-encoded bodies
 
-app.get('/api/login/:uname',cors(), async(req, res, next) => {
+app.post('/api/login', cors(), async(req, res, next) => {
   try {
-    const uname = req.params.uname;
+    const uname = req.body.uname;
     res.json({success: true, login: true, uname: uname});
   } catch (err) {
     next(err)
   }
 });
 
-app.get('/api/logout/:uname',cors(), async(req, res, next) => {
+app.post('/api/logout', cors(), async(req, res, next) => {
   try {
-    const uname = req.params.uname;
+    const uname = req.body.uname;
     res.json({success: true, logout: true, uname: uname});
+  } catch (err) {
+    next(err)
+  }
+});
+
+app.get('/api/offices', cors(), async(req, res, next) => {
+  try {
+    res.json({success: true, offices: offices});
   } catch (err) {
     next(err)
   }
