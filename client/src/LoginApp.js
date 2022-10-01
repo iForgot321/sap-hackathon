@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import './LoginApp.css'
-import ViewPage from "./ViewPage";
+import AmenitiesList from "./AmenitiesList";
+import PeopleList from "./PeopleList";
 
 class LoginApp extends Component {
   state = {
@@ -91,19 +92,34 @@ class LoginApp extends Component {
                 this.state.possibleOffices.map((name) => <option value={name} key={name}>{name}</option>)
               }
             </select>
-            <button className="loginButton" type="submit">Sign in</button>
+            <button className="btn btn-primary" type="submit">Check in</button>
           </form>
           <text className="errorText">{this.state.error}</text>
         </div>
       );
     } else {
       return (
-        <div className="LoginApp">
-          <h3>Welcome: {this.state.uname} to office {this.state.office}</h3>
-          <ViewPage />
-          <form onSubmit={this.logOut}>
-            <button className="logoutButton" type="submit">Logout</button>
-          </form>
+        <div className="MainPage">
+          <div className="container">
+            <div className="d-flex flex-row justify-content-between">
+              <h3>Welcome: {this.state.uname} to office {this.state.office}</h3>
+              <form onSubmit={this.logOut}>
+                <button className="btn btn-primary" type="submit">
+                  <i className="bi bi-door-open-fill"></i>
+                  {"  "}
+                  Check out
+                </button>
+              </form>
+            </div>
+            <div className="row">
+              <div className="col-8">
+                <AmenitiesList />
+              </div>
+              <div className="col-4">
+                <PeopleList />
+              </div>
+            </div>
+          </div>
         </div>
       )
     }

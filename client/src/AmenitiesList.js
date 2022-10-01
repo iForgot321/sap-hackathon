@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 
-class ViewPage extends Component {
+class AmenitiesList extends Component {
     state = {
         amenities: [],
     };
@@ -19,6 +19,7 @@ class ViewPage extends Component {
     render() {
         return (
             <div className="ViewPage">
+                <h3>Amenities</h3>
                 {
                     this.state.amenities.map((amenity) => (
                         <Amenity key={amenity.id} amenity={amenity}/>
@@ -82,4 +83,4 @@ class CurrentUsage extends Component {
     }
 }
 
-export default ViewPage
+export default AmenitiesList

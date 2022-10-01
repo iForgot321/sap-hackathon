@@ -3,12 +3,19 @@
   flex-direction: column;
   align-items: center;
   margin: 2em;
-  white-space: pre
+  white-space: pre;
+}
+
+.MainPage {
+  display: flex;
+  flex-direction: column;
+  margin: 2em;
+  white-space: pre;
 }
 
 h3 {
   font-size: 2.5em;
-  margin: 1em;
+  margin: 1em 0;
   padding: 0;
   border: 0
 }
