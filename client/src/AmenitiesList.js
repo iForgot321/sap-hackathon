@@ -11,8 +11,16 @@ class AmenitiesList extends Component {
         await this.fetchAmenities()
     }
 
+    updateFromResponse(json) {
+        if (json.success) {
+            this.setState({amenities: json.amenities});
+        } else {
+            alert("O NO");
+        }
+    }
+
     fetchAmenities = async () => {
-        const response = await fetch(`/api/amenities`);
+        const response = await fetch(`/api/amenities/` + this.props.office);
         const responseJson = await response.json();
         const amenities = responseJson.amenities;
         this.setState({amenities: amenities});
@@ -36,7 +44,6 @@ class AmenitiesList extends Component {
             }
         });
         const finalAmenitiesList = filteredByAvailability;
-
         return (
             <div>
                 <h3>Amenities</h3>
@@ -48,8 +55,8 @@ class AmenitiesList extends Component {
                         onChange={(evt) => this.setState({availability: evt.target.value})}
                     >
                         <option value={""}>- Availability -</option>
-                        <option value={"available"}>Find available</option>
-                        <option value={"unavailable"}>Find unavailable</option>
+                        <option value={"available"}>Full</option>
+                        <option value={"unavailable"}>Not yet full</option>
                     </select>
                     <input
                         className="form-control"
@@ -62,7 +69,9 @@ class AmenitiesList extends Component {
                 <div className="overflow-scroll" style={{height: "30em"}}>
                     {
                         finalAmenitiesList.map((amenity) => (
-                            <Amenity key={amenity.id} amenity={amenity} here={false}/>
+                            <Amenity key={amenity.id} amenity={amenity} here={
+                                amenity['people'].findIndex(person => person.email === this.props.uname) >= 0
+                            } uname={this.props.uname} callback={(json) => this.updateFromResponse(json)}/>
                         ))
                     }
                 </div>
@@ -75,9 +84,36 @@ class AmenitiesList extends Component {
  * Props: amenity, here
  */
 class Amenity extends Component {
+
+    async onLogout() {
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                  uname: this.props.uname
+              }
+            )};
+        const response = await fetch('/api/amenities/logout/' + this.props.amenity['id'], requestOptions);
+        const custom = await response.json();
+        this.props.callback(custom);
+    }
+
+    async onLogin() {
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                  uname: this.props.uname
+              }
+            )};
+        const response = await fetch('/api/amenities/login/' + this.props.amenity['id'], requestOptions);
+        const custom = await response.json();
+        this.props.callback(custom);
+    }
     render() {
         const amenity = this.props.amenity;
         const here = this.props.here;
+        const canTapIn = amenity.people.length < amenity.capacity;
         return (
             <div className="card shadow-sm my-2 w-100">
                 <div className="row g-0">
@@ -96,15 +132,23 @@ class Amenity extends Component {
                                 </div>
                             }
                             <div className="d-flex flex-row justify-content-between">
-                                <h5 className="card-title fw-bolder">{amenity.name}</h5>
+                                <h5 className="card-title fw-bolder">
+                                    {amenity.name}
+                                    {
+                                        !canTapIn &&
+                                        <span className="badge text-bg-success ms-2">Full</span>
+                                    }
+                                </h5>
                                 {
                                     here ?
-                                        <button className="btn btn-sm btn-danger">Tap out
+                                        <button className="btn btn-sm btn-danger" onClick={() => this.onLogout(amenity)}>Tap out
                                             <i className="bi bi-box-arrow-right ms-1"></i>
                                         </button> :
-                                        <button className="btn btn-sm btn-primary">Tap in
-                                            <i className="bi bi-box-arrow-in-right ms-1"></i>
-                                        </button>
+                                        canTapIn ?
+                                            <button className="btn btn-sm btn-primary" onClick={() => this.onLogin(amenity)}>Tap in
+                                                <i className="bi bi-box-arrow-in-right ms-1"></i>
+                                            </button> :
+                                            null
                                 }
                             </div>
                             <h6 className="card-subtitle mb-2 fw-normal">Located in: {amenity.room}</h6>

@@ -22,6 +22,70 @@ const bodyParser = require('body-parser')
 const app = express();
 
 //const offices = ["Vancouver", "Vancouver, Washington"];
+let amenities = [
+  {
+    'id': 1,
+    'name': 'Pool Table 1',
+    'room': 'Game Room',
+    'image': 'https://www.homestratosphere.com/wp-content/uploads/2018/05/game-room-billiards-table-may16-2018.jpg',
+    'capacity': 2,
+    'people': [
+      {
+        'email': 'abc@company.com',
+        'name': 'Jane Doe',
+        'image': 'https://images.pexels.com/photos/2381069/pexels-photo-2381069.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
+      }, {
+        'email': 'def@company.com',
+        'name': 'John Smith',
+        'image': 'https://thumbs.dreamstime.com/b/profile-picture-caucasian-male-employee-posing-office-happy-young-worker-look-camera-workplace-headshot-portrait-smiling-190186649.jpg',
+      }
+    ],
+  },
+  {
+    'id': 2,
+    'name': 'Pool Table 2',
+    'room': 'Game Room',
+    'image': 'https://www.homestratosphere.com/wp-content/uploads/2018/05/game-room-billiards-table-may16-2018.jpg',
+    'capacity': 2,
+    'people': [],
+  },
+  {
+    'id': 3,
+    'name': 'Treadmill',
+    'room': 'Gym',
+    'image': 'https://www.yanrefitness.com/wp-content/webpc-passthru.php?src=https://www.yanrefitness.com/wp-content/uploads/2020/09/How-to-Start-a-Corporate-Gym-1.jpg&nocache=1',
+    'capacity': 1,
+    'people': [
+      {
+        'email': '111@company.com',
+        'name': 'Jane Smith',
+        'image': 'https://thumbs.dreamstime.com/b/profile-picture-caucasian-male-employee-posing-office-happy-young-worker-look-camera-workplace-headshot-portrait-smiling-190186649.jpg',
+      }
+    ],
+  },
+  {
+    'id': 4,
+    'name': 'Ping Pong Table 1',
+    'room': 'Gym',
+    'image': 'https://www.yanrefitness.com/wp-content/webpc-passthru.php?src=https://www.yanrefitness.com/wp-content/uploads/2020/09/How-to-Start-a-Corporate-Gym-1.jpg&nocache=1',
+    'capacity': 2,
+    'people': [
+      {
+        'email': '112@company.com',
+        'name': 'Jane Doe',
+        'image': 'https://images.pexels.com/photos/2381069/pexels-photo-2381069.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
+      },
+    ],
+  },
+];
+
+// Serve static files from the React frontend app
+app.use(express.static(path.join(__dirname, 'client/build')));
+app.use( bodyParser.json() );       // to support JSON-encoded bodies
+
+app.get('/api/amenities/:office', cors(), async(req, res, next) => {
+  try {
+    res.json({amenities});
 
 // Serve static files from the React frontend app
 app.use(express.static(path.join(__dirname, 'client/build')));
@@ -153,6 +217,25 @@ app.post('/api/login', cors(), async(req, res, next) => {
       }
     });
 });
+app.post('/api/amenities/login/:amenity', cors(), async(req, res, next) => {
+  try {
+    const amenity = req.params.amenity;
+    const uname = req.body.uname;
+    let index = amenities.findIndex((what) => what['id'] == amenity);
+    if (index >= 0) {
+      amenities[index].people.push({
+        'email': uname,
+        'name': 'your mom',
+        'image': 'https://thumbs.dreamstime.com/b/profile-picture-caucasian-male-employee-posing-office-happy-young-worker-look-camera-workplace-headshot-portrait-smiling-190186649.jpg',
+      });
+      res.json({success: true, amenities: amenities});
+    } else {
+      res.json({success: false});
+    }
+  } catch (err) {
+    next(err);
+  }
+});
 
 app.post('/api/logout', cors(), async(req, res, next) => {
   logout(req.body.user_id).then((result) => {
@@ -163,7 +246,27 @@ app.post('/api/logout', cors(), async(req, res, next) => {
 
     res.json({success: true});
   });
+});
 
+app.post('/api/amenities/logout/:amenity', cors(), async(req, res, next) => {
+  try {
+    const amenity = req.params.amenity;
+    const uname = req.body.uname;
+    let index = amenities.findIndex((what) => what['id'] == amenity);
+    if (index >= 0) {
+      let personIndex = amenities[index].people.findIndex(person => person.email === uname);
+      if (personIndex === -1) {
+        res.json({success: false});
+      } else {
+        amenities[index].people.splice(personIndex, 1);
+        res.json({success: true, amenities: amenities});
+      }
+    } else {
+      res.json({success: false});
+    }
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.get('/api/offices', cors(), async(req, res, next) => {

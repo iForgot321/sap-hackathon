@@ -55,7 +55,7 @@ class LoginApp extends Component {
     const responseJson = await response.json();
     if (responseJson.success) {
       this.setState({uname: text, text: '', loggedIn: true});
-      localStorage.setItem(this.STORED_USERNAME_KEY, responseJson.uname);
+      localStorage.setItem(this.STORED_USERNAME_KEY, text);
       localStorage.setItem(this.STORED_OFFICE_KEY, this.state.office);
     } else {
       alert("O NO");
@@ -132,7 +132,7 @@ class LoginApp extends Component {
             </div>
             <div className="row">
               <div className="col-8">
-                <AmenitiesList />
+                <AmenitiesList uname={this.state.uname} office={this.state.office}/>
               </div>
               <div className="col-4">
                 <PeopleList office={this.state.office}/>
