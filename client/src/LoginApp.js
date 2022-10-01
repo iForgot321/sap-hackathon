@@ -4,8 +4,9 @@ import './LoginApp.css'
 class LoginApp extends Component {
   state = {
     uname: '',
+    loggedIn: false,
     office: '',
-    possibleOffices: '',
+    possibleOffices: [],
     text: ''
   };
 
@@ -17,8 +18,7 @@ class LoginApp extends Component {
     const response = await fetch(`/api/offices`);
     const responseJson = await response.json();
     const offices = responseJson.offices;
-    this.setState({ ...this.state, possibleOffices: offices });
-    console.log(this.state.possibleOffices);
+    this.setState({ possibleOffices: offices, office: offices[0] });
   };
 
   logIn = async evt => {
@@ -28,13 +28,17 @@ class LoginApp extends Component {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-          uname: text
+          uname: text,
+          office: this.state.office
       }
       )};
     const response = await fetch('/api/login/', requestOptions);
-    const custom = await response.json();
-    const uname = custom.uname;
-    this.setState({uname, text: ''})
+    const responseJson = await response.json();
+    if (responseJson.success && responseJson.login) {
+      this.setState({ text: '', loggedIn: true});
+    } else {
+      alert("O NO");
+    }
   };
 
   logOut = async evt => {
@@ -49,9 +53,10 @@ class LoginApp extends Component {
       )};
     const response = await fetch('/api/logout/', requestOptions);
     const custom = await response.json();
-    console.log(custom.success);
     if (custom.success) {
-      this.setState({uname: '', text: ''})
+      this.setState({uname: '', text: '', loggedIn: false});
+    } else {
+      alert("O NO");
     }
   };
 
@@ -72,6 +77,11 @@ class LoginApp extends Component {
               value={this.state.text}
               onChange={this.handleChange}
             />
+            <select name="office" onChange={this.handleChange}>
+              {
+                this.state.possibleOffices.map((name) => <option value={name} key={name}>{name}</option>)
+              }
+            </select>
             <button type="submit">Login</button>
           </form>
         </div>
@@ -79,7 +89,7 @@ class LoginApp extends Component {
     } else {
       return (
         <div className="LoginApp">
-          <h3>Welcome: {this.state.uname}</h3>
+          <h3>Welcome: {this.state.uname} to office {this.state.office}</h3>
           <form onSubmit={this.logOut}>
             <button type="submit">Logout</button>
           </form>
