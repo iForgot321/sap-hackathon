@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import './LoginApp.css'
+import ViewPage from "./ViewPage";
 
 class LoginApp extends Component {
   state = {
@@ -80,6 +80,7 @@ class LoginApp extends Component {
       return (
         <div className="LoginApp">
           <h3>Welcome: {this.state.uname}</h3>
+          <ViewPage />
           <form onSubmit={this.logOut}>
             <button type="submit">Logout</button>
           </form>
