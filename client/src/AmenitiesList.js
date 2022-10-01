@@ -121,28 +121,46 @@ class Amenity extends Component {
  * Props: people
  */
 class CurrentUsage extends Component {
-    render() {
-        const defaultProfilePicture = "https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg";
-        if (this.props.people.length > 0) {
-            return (
-                <div className="d-flex flex-row gap-1 align-items-center">
-                    {
-                        this.props.people.map((person) => (
-                            <ProfilePhoto key={person.email} image={person.image} name={person.name}/>
-                        ))
-                    }
-                    <div className="card-text text-muted">
-                        <small className="ms-1">are here</small>
-                    </div>
-                </div>
-            );
-        } else {
-            return (
-                <div className="card-text text-muted">
-                    <small>Nobody is here yet!</small>
-                </div>
-            );
+    getListOfNamesUsing = () => {
+        const firstNames = this.props.people.map((person) => person.name.split(" ")[0]);
+        switch (firstNames.length) {
+            case 0:
+                return "Nobody is here yet!"
+            case 1:
+                return `${firstNames[0]} is here`
+            case 2:
+                return `${firstNames[0]} and ${firstNames[1]} are here`
+            case 3:
+                return `${firstNames[0]}, ${firstNames[1]}, and ${firstNames[2]} are here`
+            default:
+                const restLength = firstNames.length - 2
+                return `${firstNames[0]}, ${firstNames[1]}, and ${restLength} more people are here`
         }
+    }
+
+    render() {
+        const profilePicturesToShow = this.props.people.slice(0, 2);
+
+        return (
+            <div className="d-flex flex-row gap-1 align-items-center">
+                {
+                    profilePicturesToShow.map((person) => (
+                        <ProfilePhoto key={person.email} image={person.image} name={person.name}/>
+                    ))
+                }
+                {
+                    this.props.people.length > profilePicturesToShow.length &&
+                    <img
+                        src="profile-etc.png"
+                        alt="Ellipsis"
+                        style={{width: "2em", height: "2em", padding: 0}}
+                    />
+                }
+                <div className="card-text text-muted">
+                    <small className="ms-1">{this.getListOfNamesUsing()}</small>
+                </div>
+            </div>
+        );
     }
 }
 
