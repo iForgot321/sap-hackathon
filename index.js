@@ -129,7 +129,7 @@ app.post('/api/amenities/logout/:amenity', cors(), async(req, res, next) => {
     const uname = req.body.uname;
     let index = amenities.findIndex((what) => what['id'] == amenity);
     if (index >= 0) {
-      let personIndex = amenities[index].people.indexOf(person => person.email === uname);
+      let personIndex = amenities[index].people.findIndex(person => person.email === uname);
       if (personIndex === -1) {
         res.json({success: false});
       } else {
