@@ -132,7 +132,7 @@ class LoginApp extends Component {
             </div>
             <div className="row">
               <div className="col-8">
-                <AmenitiesList />
+                <AmenitiesList uname={this.state.uname} office={this.state.office}/>
               </div>
               <div className="col-4">
                 <PeopleList office={this.state.office}/>
