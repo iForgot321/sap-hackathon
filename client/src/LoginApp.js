@@ -47,14 +47,14 @@ class LoginApp extends Component {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-          uname: text,
+          user_id: text,
           office: this.state.office
       }
       )};
     const response = await fetch('/api/login/', requestOptions);
     const responseJson = await response.json();
-    if (responseJson.success && responseJson.login) {
-      this.setState({uname: responseJson.uname, text: '', loggedIn: true});
+    if (responseJson.success) {
+      this.setState({uname: text, text: '', loggedIn: true});
       localStorage.setItem(this.STORED_USERNAME_KEY, responseJson.uname);
       localStorage.setItem(this.STORED_OFFICE_KEY, this.state.office);
     } else {
@@ -69,7 +69,7 @@ class LoginApp extends Component {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-          uname: this.state.uname
+          user_id: this.state.uname
         }
       )};
     const response = await fetch('/api/logout/', requestOptions);

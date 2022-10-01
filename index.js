@@ -1,6 +1,22 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+
+const {createDatabase, createTables, login, getOffices, logout} = require("./database");
+
+createDatabase().then((result) => {
+  if (result) {
+    console.log('Database created');
+    createTables().then(result => {
+      if (result) {
+        console.log('Tables created');
+      } else {
+        console.log('bad news');
+      }
+    });
+  }
+});
+
 const bodyParser = require('body-parser')
 // Create the server
 const app = express();
@@ -125,31 +141,52 @@ app.post('/api/amenities/logout/:amenity', cors(), async(req, res, next) => {
 });
 
 app.post('/api/login', cors(), async(req, res, next) => {
-  try {
-    const uname = req.body.uname;
+    const user_id = req.body.user_id;
     const office = req.body.office;
-    res.json({success: true, login: true, uname: uname, office: office});
-  } catch (err) {
-    next(err)
-  }
+
+    login(user_id, office).then((result) => {
+      if (result === undefined) {
+        res.json({success: false, message: "Database Error"});
+      } else if (result.rowCount === 0) {
+        res.json({success: false, message: "User Not Found"});
+      } else {
+        const body = {
+          success: true,
+          name: result.rows[0].name,
+          image: result.rows[0].picture_url,
+        }
+        console.log(body);
+        res.json(body);
+      }
+    });
 });
 
 app.post('/api/logout', cors(), async(req, res, next) => {
-  try {
-    const uname = req.body.uname;
-    const office = req.body.office;
-    res.json({success: true, logout: true, uname: uname, office: office});
-  } catch (err) {
-    next(err)
-  }
+  logout(req.body.user_id).then((result) => {
+    if (result === undefined) {
+      res.json({success: false, message: "Database Error"});
+      return;
+    }
+
+    res.json({success: true});
+  });
+
 });
 
 app.get('/api/offices', cors(), async(req, res, next) => {
-  try {
-    res.json({success: true, offices: offices});
-  } catch (err) {
-    next(err)
-  }
+  getOffices().then((result) => {
+    if (result === undefined) {
+      res.json({success: false, message: "Database Error"});
+      return;
+    }
+
+    const body = {
+      success: true,
+      offices: result.rows.map(val => val.office_id),
+    }
+    console.log(body);
+    res.json(body);
+  });
 });
 
 app.get('/api/online/:office', cors(), async(req, res, next) => {
