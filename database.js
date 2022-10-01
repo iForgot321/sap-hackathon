@@ -61,8 +61,6 @@ const amenityTable = `
                 REFERENCES rooms(room_id)
     );`;
 
-// const userInsert = `INSERT INTO users (name, email, picture_url) VALUES ($1 $2 $3)`;
-
 module.exports.createTables = async () => {
     console.log("Creating tables...");
     const clientDB = await pool.connect();
@@ -165,6 +163,26 @@ module.exports.getOffices = async () => {
     } finally {
         clientDB.release();
     }
+}
+
+module.exports.getOfficeUsers = async (office) => {
+    const clientDB = await pool.connect();
+    try {
+        console.log("getting list of users");
+        const query = 'SELECT u.name as name, u.user_id as id, u.picture_url as image, r.name as room FROM users u LEFT JOIN amenities a ON u.amenity_id=a.amenity_id LEFT JOIN rooms r ON r.room_id=a.room_id WHERE u.office_id=\'' + office + '\' ;';
+        console.log(query);
+        const result = await clientDB.query(query);
+        return result;
+    } catch (error) {
+        console.error(error.stack);
+        return undefined;
+    } finally {
+        clientDB.release();
+    }
+}
+
+module.exports.getAmenities = async () => {
+
 }
 
 

@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 
-const {createDatabase, createTables, login, getOffices, logout} = require("./database");
+const {createDatabase, createTables, login, getOffices, logout, getOfficeUsers} = require("./database");
 
 createDatabase().then((result) => {
   if (result) {
@@ -27,7 +27,7 @@ const app = express();
 app.use(express.static(path.join(__dirname, 'client/build')));
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 
-app.get('/api/amenities', cors(), async(req, res, next) => {
+app.get('/api/amenities/:office', cors(), async(req, res, next) => {
   try {
     res.json({amenities: [
         {
@@ -152,110 +152,20 @@ app.get('/api/offices', cors(), async(req, res, next) => {
 });
 
 app.get('/api/online/:office', cors(), async(req, res, next) => {
-  try {
-    const office = req.params.office;
-    res.json({success: true, people: [
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://st.depositphotos.com/1727324/1320/i/600/depositphotos_13209360-stock-photo-square-canvas-on-a-stretcher.jpg",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png"
-        },{
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://st.depositphotos.com/1727324/1320/i/600/depositphotos_13209360-stock-photo-square-canvas-on-a-stretcher.jpg",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png"
-        },{
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://st.depositphotos.com/1727324/1320/i/600/depositphotos_13209360-stock-photo-square-canvas-on-a-stretcher.jpg",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png"
-        },{
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://st.depositphotos.com/1727324/1320/i/600/depositphotos_13209360-stock-photo-square-canvas-on-a-stretcher.jpg",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png"
-        },{
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://st.depositphotos.com/1727324/1320/i/600/depositphotos_13209360-stock-photo-square-canvas-on-a-stretcher.jpg",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png"
-        },{
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://st.depositphotos.com/1727324/1320/i/600/depositphotos_13209360-stock-photo-square-canvas-on-a-stretcher.jpg",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png"
-        },
-      ]});
-  } catch (err) {
-    next(err)
-  }
+  const office = req.params.office;
+  getOfficeUsers(office).then((result) => {
+    if (result === undefined) {
+      res.json({success: false, message: "Database Error"});
+      return;
+    }
+
+    const body = {
+      success: true,
+      people: result.rows
+    }
+    console.log(body);
+    res.json(body);
+  });
 });
 
 // Anything that doesn't match the above, send back the index.html file
