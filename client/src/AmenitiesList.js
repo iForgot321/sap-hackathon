@@ -1,4 +1,5 @@
 import React, {Component, useState} from 'react'
+import './AmenitiesList.css';
 
 class AmenitiesList extends Component {
     state = {
@@ -66,14 +67,16 @@ class AmenitiesList extends Component {
                         onChange={(evt) => this.setState({searchString: evt.target.value})}
                     />
                 </div>
-                <div className="overflow-scroll" style={{height: "30em"}}>
-                    {
-                        finalAmenitiesList.map((amenity) => (
-                            <Amenity key={amenity.id} amenity={amenity} here={
-                                amenity['people'].findIndex(person => person.email === this.props.uname) >= 0
-                            } uname={this.props.uname} callback={(json) => this.updateFromResponse(json)}/>
-                        ))
-                    }
+                <div className="px-3 py-2 overflow-scroll" style={{height: "30em"}}>
+                    <div>
+                        {
+                            finalAmenitiesList.map((amenity) => (
+                                <Amenity key={amenity.id} amenity={amenity} here={
+                                    amenity['people'].findIndex(person => person.email === this.props.uname) >= 0
+                                } uname={this.props.uname} callback={(json) => this.updateFromResponse(json)}/>
+                            ))
+                        }
+                    </div>
                 </div>
             </div>
         );
@@ -114,8 +117,9 @@ class Amenity extends Component {
         const amenity = this.props.amenity;
         const here = this.props.here;
         const canTapIn = amenity.people.length < amenity.capacity;
+        const imageSrc = amenity.image ? amenity.image : 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/681px-Placeholder_view_vector.svg.png';
         return (
-            <div className="card shadow-sm my-2 w-100">
+            <div className="ItemCard card my-3 w-100">
                 <div className="row g-0">
                     <div className="col-md-4">
                         {
@@ -127,7 +131,7 @@ class Amenity extends Component {
                             </div>
                         }
                         <img
-                            src={amenity.image}
+                            src={imageSrc}
                             className="img-fluid rounded-start"
                             alt={`Photo of ${amenity.name}`} />
                     </div>

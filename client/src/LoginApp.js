@@ -120,7 +120,7 @@ class LoginApp extends Component {
     } else {
       return (
         <div className="MainPage">
-          <div className="container">
+          <div className="container-fluid">
             <div className="d-flex flex-row justify-content-between">
               <h2 className="pb-4">Welcome to the SAP {this.state.office} office!</h2>
               <form onSubmit={this.logOut}>
