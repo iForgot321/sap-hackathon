@@ -1,0 +1,65 @@
+.LoginApp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2em;
+  white-space: pre
+}
+
+h3 {
+  font-size: 2.5em;
+  margin: 1em;
+  padding: 0;
+  border: 0
+}
+
+.loginButton {
+  font-size: 1.5em;
+  font-family: "Calibri", monospace;
+  border: 0;
+  border-radius: 0.4em;
+  margin: 1em 3em;
+  padding: 10px 25px;
+  background-color: #9BC6ED;
+}
+
+.logoutButton {
+  font-size: 1.5em;
+  font-family: "Calibri", monospace;
+  border: 0;
+  border-radius: 0.4em;
+  margin: 1em 3em;
+  padding: 10px 25px;
+  background-color: #9BC6ED;
+}
+
+.errorText {
+  color: red
+}
+
+button:hover {
+  background-color: rgb(120,170,225);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+.officeDropdown {
+  font-size: 1em;
+  border: 0px;
+  padding: 0.2em 0.4em;
+  border-radius: 0.4em;
+  background-color: #F3F3F3;
+}
+
+input {
+  font-size: 1.5em;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding: 0.2em 0.4em;
+  border-radius: 0.4em;
+  border: 0px;
+  background-color: #F3F3F3;
+}

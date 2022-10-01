@@ -1,30 +1,79 @@
 const express = require('express');
-const cowsay = require('cowsay');
 const cors = require('cors');
 const path = require('path');
-
+const bodyParser = require('body-parser')
 // Create the server
 const app = express();
 
+const offices = ["Vancouver", "Vancouver, Washington"];
+
 // Serve static files from the React frontend app
 app.use(express.static(path.join(__dirname, 'client/build')));
+app.use( bodyParser.json() );       // to support JSON-encoded bodies
 
-// Serve our api route /cow that returns a custom talking text cow
-app.get('/api/cow/:say', cors(), async (req, res, next) => {
+app.get('/api/amenities', cors(), async(req, res, next) => {
   try {
-    const text = req.params.say;
-    const moo = cowsay.say({text});
-    res.json({moo})
+    res.json({amenities: [
+        {
+          'id': 1,
+          'name': 'Pool Table 1',
+          'room': 'Game Room',
+          'capacity': 2,
+          'people': [
+            {
+              'email': 'abc@company.com',
+              'name': 'Jane Doe',
+              'image': 'https://images.pexels.com/photos/2381069/pexels-photo-2381069.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
+            }, {
+              'email': 'def@company.com',
+              'name': 'John Smith',
+              'image': 'https://thumbs.dreamstime.com/b/profile-picture-caucasian-male-employee-posing-office-happy-young-worker-look-camera-workplace-headshot-portrait-smiling-190186649.jpg',
+            }
+          ],
+        },
+        {
+          'id': 2,
+          'name': 'Pool Table 2',
+          'room': 'Game Room',
+          'capacity': 2,
+          'people': [],
+        },
+        {
+          'id': 3,
+          'name': 'Treadmill',
+          'room': 'Gym',
+          'capacity': 1,
+          'people': [],
+        },
+      ]});
   } catch (err) {
     next(err)
   }
 });
 
-// Serve our base route that returns a Hellow World cow
-app.get('/api/cow/', cors(), async (req, res, next) => {
+app.post('/api/login', cors(), async(req, res, next) => {
   try {
-    const moo = cowsay.say({text: 'Hello World!'});
-    res.json({moo})
+    const uname = req.body.uname;
+    const office = req.body.office;
+    res.json({success: true, login: true, uname: uname, office: office});
+  } catch (err) {
+    next(err)
+  }
+});
+
+app.post('/api/logout', cors(), async(req, res, next) => {
+  try {
+    const uname = req.body.uname;
+    const office = req.body.office;
+    res.json({success: true, logout: true, uname: uname, office: office});
+  } catch (err) {
+    next(err)
+  }
+});
+
+app.get('/api/offices', cors(), async(req, res, next) => {
+  try {
+    res.json({success: true, offices: offices});
   } catch (err) {
     next(err)
   }
