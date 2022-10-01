@@ -35,7 +35,7 @@ class LoginApp extends Component {
     const response = await fetch('/api/login/', requestOptions);
     const responseJson = await response.json();
     if (responseJson.success && responseJson.login) {
-      this.setState({ text: '', loggedIn: true});
+      this.setState({uname: responseJson.uname, text: '', loggedIn: true});
     } else {
       alert("O NO");
     }
@@ -65,7 +65,7 @@ class LoginApp extends Component {
   };
 
   render() {
-    if (this.state.uname === '') {
+    if (!this.state.loggedIn) {
       return (
         <div className="LoginApp">
           <h3>Login</h3>
