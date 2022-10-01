@@ -93,7 +93,10 @@ class LoginApp extends Component {
                 this.state.possibleOffices.map((name) => <option value={name} key={name}>{name}</option>)
               }
             </select>
-            <button className="btn btn-primary mb-3" type="submit">Check in</button>
+            <button className="btn btn-primary mb-3" type="submit">
+              <i className="bi bi-door-open me-2"></i>
+              Check in
+            </button>
           </form>
           <p className="text-danger">{this.state.error}</p>
         </div>
@@ -103,7 +106,7 @@ class LoginApp extends Component {
         <div className="MainPage">
           <div className="container">
             <div className="d-flex flex-row justify-content-between">
-              <h3 className="pb-4">Welcome to the {this.state.office} office</h3>
+              <h2 className="pb-4">Welcome to the SAP {this.state.office} office!</h2>
               <form onSubmit={this.logOut}>
                 <button className="btn btn-primary" type="submit">
                   <i className="bi bi-door-open-fill me-2"></i>

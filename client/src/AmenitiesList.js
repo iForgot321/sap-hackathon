@@ -59,7 +59,7 @@ class AmenitiesList extends Component {
                         onChange={(evt) => this.setState({searchString: evt.target.value})}
                     />
                 </div>
-                <div className="overflow-scroll" style={{height: "75vh"}}>
+                <div className="overflow-scroll" style={{height: "25em"}}>
                     {
                         finalAmenitiesList.map((amenity) => (
                             <Amenity key={amenity.id} amenity={amenity} here={false}/>

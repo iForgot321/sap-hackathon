@@ -38,7 +38,7 @@ class PeopleList extends Component {
                  value={this.state.searchtext}
                  onChange={this.handleSearchChange}/>
         </div>
-        <small>View everyone presently in the office</small>
+        <small className="text-muted">View everyone currently in the office.</small>
         <hr/>
         {
           this.state.displayedPeople.map((person) => (
