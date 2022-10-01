@@ -83,18 +83,19 @@ class LoginApp extends Component {
             <input
               type="text"
               name="text"
+              className="form-control my-3"
               placeholder="Company Email"
               value={this.state.text}
               onChange={this.handleChange}
             />
-            <select className="officeDropdown" name="office" onChange={this.handleChange}>
+            <select className="form-select mb-3" name="office" onChange={this.handleChange}>
               {
                 this.state.possibleOffices.map((name) => <option value={name} key={name}>{name}</option>)
               }
             </select>
-            <button className="btn btn-primary" type="submit">Check in</button>
+            <button className="btn btn-primary mb-3" type="submit">Check in</button>
           </form>
-          <text className="errorText">{this.state.error}</text>
+          <p className="text-danger">{this.state.error}</p>
         </div>
       );
     } else {
@@ -102,11 +103,10 @@ class LoginApp extends Component {
         <div className="MainPage">
           <div className="container">
             <div className="d-flex flex-row justify-content-between">
-              <h3>Welcome: {this.state.uname} to office {this.state.office}</h3>
+              <h3 className="pb-4">Welcome to the {this.state.office} office</h3>
               <form onSubmit={this.logOut}>
                 <button className="btn btn-primary" type="submit">
-                  <i className="bi bi-door-open-fill"></i>
-                  {"  "}
+                  <i className="bi bi-door-open-fill me-2"></i>
                   Check out
                 </button>
               </form>
@@ -116,7 +116,7 @@ class LoginApp extends Component {
                 <AmenitiesList />
               </div>
               <div className="col-4">
-                <PeopleList />
+                <PeopleList office={this.state.office}/>
               </div>
             </div>
           </div>
