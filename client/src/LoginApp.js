@@ -6,6 +6,7 @@ class LoginApp extends Component {
     uname: '',
     loggedIn: false,
     office: '',
+    error: '',
     possibleOffices: [],
     text: ''
   };
@@ -24,6 +25,10 @@ class LoginApp extends Component {
   logIn = async evt => {
     evt.preventDefault();
     const text = this.state.text;
+    if (this.state.text === '') {
+      this.setState({error: "Please provide a company email."});
+      return;
+    }
     const requestOptions = {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -61,29 +66,33 @@ class LoginApp extends Component {
   };
 
   handleChange = evt => {
-    this.setState({[evt.target.name]: evt.target.value})
+    this.setState({[evt.target.name]: evt.target.value});
+    if (evt.target.name === "text") {
+      this.setState({error: ""});
+    }
   };
 
   render() {
     if (!this.state.loggedIn) {
       return (
         <div className="LoginApp">
-          <h3>Login</h3>
+          <h3>[name of app]</h3>
           <form onSubmit={this.logIn}>
-            <label>Username:</label>
             <input
               type="text"
               name="text"
+              placeholder="Company Email"
               value={this.state.text}
               onChange={this.handleChange}
             />
-            <select name="office" onChange={this.handleChange}>
+            <select className="officeDropdown" name="office" onChange={this.handleChange}>
               {
                 this.state.possibleOffices.map((name) => <option value={name} key={name}>{name}</option>)
               }
             </select>
-            <button type="submit">Login</button>
+            <button className="loginButton" type="submit">Sign in</button>
           </form>
+          <text className="errorText">{this.state.error}</text>
         </div>
       );
     } else {
@@ -91,7 +100,7 @@ class LoginApp extends Component {
         <div className="LoginApp">
           <h3>Welcome: {this.state.uname} to office {this.state.office}</h3>
           <form onSubmit={this.logOut}>
-            <button type="submit">Logout</button>
+            <button className="logoutButton" type="submit">Logout</button>
           </form>
         </div>
       )
