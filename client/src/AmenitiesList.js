@@ -6,10 +6,34 @@ class AmenitiesList extends Component {
         amenities: [],
         availability: "",
         searchString: "",
+        amenityLoggedIn: null,
     };
 
     async componentDidMount() {
         await this.fetchAmenities()
+    }
+
+    preLogout() {
+        this.setState({amenityLoggedIn: null});
+    }
+
+    async preLogin(amenity) {
+        if (this.state.amenityLoggedIn !== null) {
+            const requestOptions = {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    uname: this.props.uname
+                })
+            };
+            const response = await fetch('/api/amenities/logout/' + this.state.amenityLoggedIn['id'], requestOptions);
+            const custom = await response.json();
+            if (!custom.success) {
+                alert("O NO");
+                console.log("o no logout on login failed");
+            }
+        }
+        this.setState({amenityLoggedIn: amenity});
     }
 
     updateFromResponse(json) {
@@ -73,7 +97,7 @@ class AmenitiesList extends Component {
                             finalAmenitiesList.map((amenity) => (
                                 <Amenity key={amenity.id} amenity={amenity} here={
                                     amenity['people'].findIndex(person => person.email === this.props.uname) >= 0
-                                } uname={this.props.uname} callback={(json) => this.updateFromResponse(json)}/>
+                                } uname={this.props.uname} callback={(json) => this.updateFromResponse(json)} prelogcallback={async () => await this.preLogin(amenity)} preoutcallback={() => this.preLogout()}/>
                             ))
                         }
                     </div>
@@ -89,6 +113,7 @@ class AmenitiesList extends Component {
 class Amenity extends Component {
 
     async onLogout() {
+        this.props.preoutcallback();
         const requestOptions = {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -102,6 +127,7 @@ class Amenity extends Component {
     }
 
     async onLogin() {
+        await this.props.prelogcallback();
         const requestOptions = {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
