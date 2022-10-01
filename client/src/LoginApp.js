@@ -4,6 +4,9 @@ import AmenitiesList from "./AmenitiesList";
 import PeopleList from "./PeopleList";
 
 class LoginApp extends Component {
+  STORED_USERNAME_KEY = 'uname';
+  STORED_OFFICE_KEY = 'office';
+
   state = {
     uname: '',
     loggedIn: false,
@@ -13,8 +16,17 @@ class LoginApp extends Component {
     text: ''
   };
 
-  componentDidMount() {
-    this.fetchOffices()
+  async componentDidMount() {
+    this.fetchExistingSession()
+    await this.fetchOffices()
+  }
+
+  fetchExistingSession = () => {
+    const existingUsername = localStorage.getItem(this.STORED_USERNAME_KEY);
+    const existingOffice = localStorage.getItem(this.STORED_OFFICE_KEY);
+    if (existingUsername && existingOffice) {
+      this.setState({uname: existingUsername, text: '', loggedIn: true, office: existingOffice});
+    }
   }
 
   fetchOffices = async () => {
@@ -43,6 +55,8 @@ class LoginApp extends Component {
     const responseJson = await response.json();
     if (responseJson.success) {
       this.setState({uname: text, text: '', loggedIn: true});
+      localStorage.setItem(this.STORED_USERNAME_KEY, responseJson.uname);
+      localStorage.setItem(this.STORED_OFFICE_KEY, this.state.office);
     } else {
       alert("O NO");
     }
@@ -62,6 +76,8 @@ class LoginApp extends Component {
     const custom = await response.json();
     if (custom.success) {
       this.setState({uname: '', text: '', loggedIn: false});
+      localStorage.removeItem(this.STORED_USERNAME_KEY);
+      localStorage.removeItem(this.STORED_OFFICE_KEY);
     } else {
       alert("O NO");
     }
@@ -83,18 +99,22 @@ class LoginApp extends Component {
             <input
               type="text"
               name="text"
+              className="form-control my-3"
               placeholder="Company Email"
               value={this.state.text}
               onChange={this.handleChange}
             />
-            <select className="officeDropdown" name="office" onChange={this.handleChange}>
+            <select className="form-select mb-3" name="office" onChange={this.handleChange}>
               {
                 this.state.possibleOffices.map((name) => <option value={name} key={name}>{name}</option>)
               }
             </select>
-            <button className="btn btn-primary" type="submit">Check in</button>
+            <button className="btn btn-primary mb-3" type="submit">
+              <i className="bi bi-door-open me-2"></i>
+              Check in
+            </button>
           </form>
-          <text className="errorText">{this.state.error}</text>
+          <p className="text-danger">{this.state.error}</p>
         </div>
       );
     } else {
@@ -102,11 +122,10 @@ class LoginApp extends Component {
         <div className="MainPage">
           <div className="container">
             <div className="d-flex flex-row justify-content-between">
-              <h3>Welcome: {this.state.uname} to office {this.state.office}</h3>
+              <h2 className="pb-4">Welcome to the SAP {this.state.office} office!</h2>
               <form onSubmit={this.logOut}>
                 <button className="btn btn-primary" type="submit">
-                  <i className="bi bi-door-open-fill"></i>
-                  {"  "}
+                  <i className="bi bi-door-open-fill me-2"></i>
                   Check out
                 </button>
               </form>
@@ -116,7 +135,7 @@ class LoginApp extends Component {
                 <AmenitiesList />
               </div>
               <div className="col-4">
-                <PeopleList />
+                <PeopleList office={this.state.office}/>
               </div>
             </div>
           </div>
