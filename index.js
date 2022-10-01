@@ -103,6 +103,26 @@ app.get('/api/amenities/:office', cors(), async(req, res, next) => {
   }
 });
 
+app.post('/api/login', cors(), async(req, res, next) => {
+    const user_id = req.body.user_id;
+    const office = req.body.office;
+
+    login(user_id, office).then((result) => {
+      if (result === undefined) {
+        res.json({success: false, message: "Database Error"});
+      } else if (result.rowCount === 0) {
+        res.json({success: false, message: "User Not Found"});
+      } else {
+        const body = {
+          success: true,
+          name: result.rows[0].name,
+          image: result.rows[0].picture_url,
+        }
+        console.log(body);
+        res.json(body);
+      }
+    });
+});
 app.post('/api/amenities/login/:amenity', cors(), async(req, res, next) => {
   try {
     const amenity = req.params.amenity;
@@ -121,6 +141,17 @@ app.post('/api/amenities/login/:amenity', cors(), async(req, res, next) => {
   } catch (err) {
     next(err);
   }
+});
+
+app.post('/api/logout', cors(), async(req, res, next) => {
+  logout(req.body.user_id).then((result) => {
+    if (result === undefined) {
+      res.json({success: false, message: "Database Error"});
+      return;
+    }
+
+    res.json({success: true});
+  });
 });
 
 app.post('/api/amenities/logout/:amenity', cors(), async(req, res, next) => {
@@ -142,39 +173,6 @@ app.post('/api/amenities/logout/:amenity', cors(), async(req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
-
-app.post('/api/login', cors(), async(req, res, next) => {
-    const user_id = req.body.user_id;
-    const office = req.body.office;
-
-    login(user_id, office).then((result) => {
-      if (result === undefined) {
-        res.json({success: false, message: "Database Error"});
-      } else if (result.rowCount === 0) {
-        res.json({success: false, message: "User Not Found"});
-      } else {
-        const body = {
-          success: true,
-          name: result.rows[0].name,
-          image: result.rows[0].picture_url,
-        }
-        console.log(body);
-        res.json(body);
-      }
-    });
-});
-
-app.post('/api/logout', cors(), async(req, res, next) => {
-  logout(req.body.user_id).then((result) => {
-    if (result === undefined) {
-      res.json({success: false, message: "Database Error"});
-      return;
-    }
-
-    res.json({success: true});
-  });
-
 });
 
 app.get('/api/offices', cors(), async(req, res, next) => {
