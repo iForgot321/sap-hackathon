@@ -130,8 +130,12 @@ app.post('/api/amenities/logout/:amenity', cors(), async(req, res, next) => {
     let index = amenities.findIndex((what) => what['id'] == amenity);
     if (index >= 0) {
       let personIndex = amenities[index].people.indexOf(person => person.email === uname);
-      amenities[index].people.splice(personIndex,1);
-      res.json({success: true, amenities: amenities});
+      if (personIndex === -1) {
+        res.json({success: false});
+      } else {
+        amenities[index].people.splice(personIndex, 1);
+        res.json({success: true, amenities: amenities});
+      }
     } else {
       res.json({success: false});
     }

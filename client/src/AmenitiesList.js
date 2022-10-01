@@ -44,6 +44,14 @@ class AmenitiesList extends Component {
             }
         });
         const finalAmenitiesList = filteredByAvailability;
+        const unameThatDoesNotHaveThisForSomeReason = this.props.uname;
+        for (let i = 0; i < finalAmenitiesList.length; i++) {
+            let amenity = finalAmenitiesList[i];
+            for (let j = 0; j < amenity.people.length; j++) {
+                console.log(amenity.people[j].email === unameThatDoesNotHaveThisForSomeReason);
+            }
+            console.log(amenity.people.indexOf((person) => person.email === unameThatDoesNotHaveThisForSomeReason));
+        }
 
         return (
             <div>
@@ -70,7 +78,9 @@ class AmenitiesList extends Component {
                 <div className="overflow-scroll" style={{height: "30em"}}>
                     {
                         finalAmenitiesList.map((amenity) => (
-                            <Amenity key={amenity.id} amenity={amenity} here={amenity['people'].indexOf(person => person['email'] == this.props.uname) >= 0} uname={this.props.uname} callback={(json) => this.updateFromResponse(json)}/>
+                            <Amenity key={amenity.id} amenity={amenity} here={
+                                amenity['people'].indexOf(person => person.email === unameThatDoesNotHaveThisForSomeReason) >= 0
+                            } uname={this.props.uname} callback={(json) => this.updateFromResponse(json)}/>
                         ))
                     }
                 </div>
