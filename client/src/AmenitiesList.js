@@ -118,6 +118,14 @@ class Amenity extends Component {
             <div className="card shadow-sm my-2 w-100">
                 <div className="row g-0">
                     <div className="col-md-4">
+                        {
+                            here &&
+                            <div className="position-absolute fs-4" style={{top: "5px"}}>
+                                <span className="badge text-bg-light ms-2">
+                                    You are here!
+                                </span>
+                            </div>
+                        }
                         <img
                             src={amenity.image}
                             className="img-fluid rounded-start"
@@ -125,12 +133,6 @@ class Amenity extends Component {
                     </div>
                     <div className="col-md-8">
                         <div className="card-body">
-                            {
-                                here &&
-                                <div className="card-text text-muted">
-                                    <small>You are here!</small>
-                                </div>
-                            }
                             <div className="d-flex flex-row justify-content-between">
                                 <h5 className="card-title fw-bolder">
                                     {amenity.name}
