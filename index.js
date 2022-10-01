@@ -18,6 +18,7 @@ app.get('/api/amenities', cors(), async(req, res, next) => {
           'id': 1,
           'name': 'Pool Table 1',
           'room': 'Game Room',
+          'image': 'https://www.homestratosphere.com/wp-content/uploads/2018/05/game-room-billiards-table-may16-2018.jpg',
           'capacity': 2,
           'people': [
             {
@@ -35,6 +36,7 @@ app.get('/api/amenities', cors(), async(req, res, next) => {
           'id': 2,
           'name': 'Pool Table 2',
           'room': 'Game Room',
+          'image': 'https://www.homestratosphere.com/wp-content/uploads/2018/05/game-room-billiards-table-may16-2018.jpg',
           'capacity': 2,
           'people': [],
         },
@@ -42,8 +44,41 @@ app.get('/api/amenities', cors(), async(req, res, next) => {
           'id': 3,
           'name': 'Treadmill',
           'room': 'Gym',
+          'image': 'https://www.yanrefitness.com/wp-content/webpc-passthru.php?src=https://www.yanrefitness.com/wp-content/uploads/2020/09/How-to-Start-a-Corporate-Gym-1.jpg&nocache=1',
           'capacity': 1,
-          'people': [],
+          'people': [
+            {
+              'email': 'def@company.com',
+              'name': 'Jane Smith',
+              'image': 'https://thumbs.dreamstime.com/b/profile-picture-caucasian-male-employee-posing-office-happy-young-worker-look-camera-workplace-headshot-portrait-smiling-190186649.jpg',
+            }
+          ],
+        },
+        {
+          'id': 4,
+          'name': 'Ping Pong Table 1',
+          'room': 'Gym',
+          'image': 'https://www.yanrefitness.com/wp-content/webpc-passthru.php?src=https://www.yanrefitness.com/wp-content/uploads/2020/09/How-to-Start-a-Corporate-Gym-1.jpg&nocache=1',
+          'capacity': 1,
+          'people': [
+            {
+              'email': 'abc@company.com',
+              'name': 'Jane Doe',
+              'image': 'https://images.pexels.com/photos/2381069/pexels-photo-2381069.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
+            }, {
+              'email': 'def@company.com',
+              'name': 'John Smith',
+              'image': 'https://thumbs.dreamstime.com/b/profile-picture-caucasian-male-employee-posing-office-happy-young-worker-look-camera-workplace-headshot-portrait-smiling-190186649.jpg',
+            }, {
+              'email': 'alskj@company.com',
+              'name': 'Mark Front',
+              'image': 'https://thumbs.dreamstime.com/b/profile-picture-caucasian-male-employee-posing-office-happy-young-worker-look-camera-workplace-headshot-portrait-smiling-190186649.jpg',
+            }, {
+              'email': '09d8sj@company.com',
+              'name': 'Harry Meter',
+              'image': 'https://thumbs.dreamstime.com/b/profile-picture-caucasian-male-employee-posing-office-happy-young-worker-look-camera-workplace-headshot-portrait-smiling-190186649.jpg',
+            }
+          ],
         },
       ]});
   } catch (err) {
