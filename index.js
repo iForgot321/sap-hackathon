@@ -21,7 +21,7 @@ const bodyParser = require('body-parser')
 // Create the server
 const app = express();
 
-const offices = ["Vancouver", "Vancouver, Washington"];
+//const offices = ["Vancouver", "Vancouver, Washington"];
 let amenities = [
   {
     'id': 1,
