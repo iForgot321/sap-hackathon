@@ -69,10 +69,10 @@ class Person extends Component {
     const defaultProfilePicture = "https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg";
     const person = this.props.person;
     let smallText;
-    if (person.room === undefined) {
-      smallText = <div/>
-    } else {
+    if (person.room) {
       smallText = <small>Find them in <strong>{person.room}</strong></small>
+    } else {
+      smallText = <div/>
     }
     return (
       <div className="card shadow-sm mb-2 w-100">
