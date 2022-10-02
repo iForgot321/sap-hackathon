@@ -131,7 +131,13 @@ class AmenitiesList extends Component {
  * Props: amenity, here
  */
 class Amenity extends Component {
-
+    state = {
+        lastUsedTime: "",
+        lastUsedUser: '',
+        popularDay: '',
+        topUsers: [],
+        error: '',
+    }
     async onLogout() {
         const requestOptions = {
             method: 'POST',
@@ -163,11 +169,51 @@ class Amenity extends Component {
             isTapIn: true
         });
     }
+
+    async onStatsLoad() {
+        const response = await fetch('/api/amenities/stats/' + this.props.amenity['id']);
+        const json = await response.json();
+        if (json.success) {
+            this.setState({
+                lastUsedTime: json.lastUsedTime,
+                lastUsedUser: json.lastUsedUser,
+                popularDay: json.popularDay,
+                topUsers: json.topUsers,
+                error: ''
+            });
+        } else {
+            this.setState({
+                lastUsedTime: '',
+                lastUsedUser: '',
+                popularDay: '',
+                topUsers: [],
+                error: "Database error"
+            })
+        }
+    }
+
     render() {
         const amenity = this.props.amenity;
         const here = this.props.here;
         const canTapIn = amenity.people.length < amenity.capacity;
         const imageSrc = amenity.image ? amenity.image : 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/681px-Placeholder_view_vector.svg.png';
+        let offcanvas;
+        if (this.state.error !== '') {
+            offcanvas = <div>
+                <p className="text-danger">{this.state.error}</p>
+            </div>;
+        } else {
+            offcanvas =<div>
+                <p>Last day used: {this.state.lastUsedTime}</p>
+                <p>Last user: {this.state.lastUsedUser}</p>
+                <p>Most popular day: {this.state.popularDay}</p>
+                <p>Top Users: </p>
+                <p>  1:  {this.state.topUsers[0]}</p>
+                <p>  2:  {this.state.topUsers[1]}</p>
+                <p>  3:  {this.state.topUsers[2]}</p>
+            </div>;
+        }
+
         return (
             <div className="ItemCard card my-3 w-100">
                 <div className="row g-0">
@@ -196,6 +242,10 @@ class Amenity extends Component {
                                         <span className="badge text-bg-success ms-2">Full</span>
                                     }
                                 </h5>
+
+                                <button className="btn btn-primary" type="button" data-bs-toggle="offcanvas"
+                                        data-bs-target="#amenitystats" aria-controls="amenitystats" onClick={() => this.onStatsLoad()}>Stats
+                                </button>
                                 {
                                     here ?
                                         <button className="btn btn-danger" onClick={() => this.onLogout(amenity)}>Tap out
@@ -211,6 +261,17 @@ class Amenity extends Component {
                             <h6 className="card-subtitle mb-2 fw-normal">Located in: {amenity.room}</h6>
                             <CurrentUsage people={amenity.people} />
                         </div>
+                    </div>
+                </div>
+
+                <div className="offcanvas offcanvas-end" tabIndex="-1" id="amenitystats">
+                    <div className="offcanvas-header">
+                        <h5 className="offcanvas-title" id="offcanvasRightLabel">Amenity statistics</h5>
+                        <button type="button" className="btn-close" data-bs-dismiss="offcanvas"
+                                aria-label="Close"></button>
+                    </div>
+                    <div className="offcanvas-body">
+                        {offcanvas}
                     </div>
                 </div>
             </div>
