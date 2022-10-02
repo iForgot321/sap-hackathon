@@ -296,8 +296,36 @@ module.exports.getUser = async (user_id) => {
     }
 }
 
-module.exports.getAmenityStatistics = async (amenity) => {
+module.exports.getAmenityLogs = async (amenity) => {
+    const clientDB = await pool.connect();
+    try {
+        console.log("getting amenities statistics " + amenity);
+        const query = `SELECT * FROM activity_log WHERE amenity_id='${amenity}' ORDER BY log_id DESC`;
+        console.log(query);
+        const result = await clientDB.query(query);
+        return result;
+    } catch (error) {
+        console.error(error.stack);
+        return undefined;
+    } finally {
+        clientDB.release();
+    }
+}
 
+module.exports.getAmenityTopUsers = async (amenity) => {
+    const clientDB = await pool.connect();
+    try {
+        console.log("getting amenities statistics " + amenity);
+        const query = `SELECT u.name as name, COUNT(*) as count FROM activity_log a LEFT JOIN users u ON a.user_id=u.user_id WHERE a.amenity_id='${amenity}' GROUP BY u.user_id ORDER BY count DESC LIMIT 3;`;
+        console.log(query);
+        const result = await clientDB.query(query);
+        return result;
+    } catch (error) {
+        console.error(error.stack);
+        return undefined;
+    } finally {
+        clientDB.release();
+    }
 }
 
 

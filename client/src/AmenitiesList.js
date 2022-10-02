@@ -9,6 +9,10 @@ class AmenitiesList extends Component {
     };
 
     async componentDidMount() {
+        const response = await fetch('/api/amenities/stats/4');
+        const responseJson = await response.json();
+        console.log(responseJson);
+
         await this.fetchAmenities();
     }
 
