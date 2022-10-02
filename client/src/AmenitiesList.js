@@ -191,7 +191,7 @@ class Amenity extends Component {
     render() {
         const amenity = this.props.amenity;
         const here = this.props.here;
-        const canTapIn = amenity.people.length < amenity.capacity;
+        const canTapIn = !amenity.capacity || amenity.people.length < amenity.capacity;
         const imageSrc = amenity.image ? amenity.image : 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/681px-Placeholder_view_vector.svg.png';
 
         return (
