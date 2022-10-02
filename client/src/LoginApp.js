@@ -42,7 +42,6 @@ class LoginApp extends Component {
   };
 
   logIn = async evt => {
-    const actualOffice = document.getElementById('office').value;
     evt.preventDefault();
     const text = this.state.text;
     if (this.state.text === '') {
@@ -54,15 +53,15 @@ class LoginApp extends Component {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
           user_id: text,
-          office: actualOffice
-      }
-      )};
+          office: this.state.office,
+      })
+    };
     const response = await fetch('/api/login/', requestOptions);
     const responseJson = await response.json();
     if (responseJson.success) {
       this.setState({uname: text, name: responseJson.name, text: '', loggedIn: true, office_url: responseJson.office_image});
       localStorage.setItem(this.STORED_USERNAME_KEY, text);
-      localStorage.setItem(this.STORED_OFFICE_KEY, actualOffice);
+      localStorage.setItem(this.STORED_OFFICE_KEY, this.state.office);
     } else {
       alert(responseJson.message);
     }
@@ -120,7 +119,7 @@ class LoginApp extends Component {
                     onChange={this.handleChange}
                 />
                 <label htmlFor="office" className="form-label">Office</label>
-                <select className="form-select mb-3" id="office" name="office" onChange={this.handleChange}>
+                <select className="form-select mb-3" id="office" name="office" value={this.state.office} onChange={this.handleChange}>
                   {
                     this.state.possibleOffices.map((name) => <option value={name} key={name}>{name}</option>)
                   }
