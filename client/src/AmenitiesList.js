@@ -263,13 +263,13 @@ class Amenity extends Component {
                             <CurrentUsage people={amenity.people} />
                             <br/>
                             <button className="btn btn-secondary btn-sm" type="button" data-bs-toggle="offcanvas"
-                                    data-bs-target="#amenitystats" aria-controls="amenitystats" onClick={() => this.onStatsLoad()}>Stats
+                                    data-bs-target={"#amenitystats" + this.props.amenity.id} aria-controls="amenitystats" onClick={() => this.onStatsLoad()}>Stats
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div className="offcanvas offcanvas-end" tabIndex="-1" id="amenitystats">
+                <div className="offcanvas offcanvas-end" tabIndex="-1" id={"amenitystats" + this.props.amenity.id}>
                     <div className="offcanvas-header">
                         <h5 className="offcanvas-title" id="offcanvasRightLabel">Amenity statistics</h5>
                         <button type="button" className="btn-close" data-bs-dismiss="offcanvas"

@@ -320,7 +320,7 @@ module.exports.getAmenityLogs = async (amenity) => {
     const clientDB = await pool.connect();
     try {
         console.log("getting amenities statistics " + amenity);
-        const query = `SELECT * FROM activity_log WHERE amenity_id='${amenity}' ORDER BY log_id DESC`;
+        const query = `SELECT u.name as name, a.date as date FROM activity_log a LEFT JOIN users u ON a.user_id=u.user_id WHERE a.amenity_id='${amenity}' ORDER BY a.log_id DESC`;
         console.log(query);
         const result = await clientDB.query(query);
         return result;
