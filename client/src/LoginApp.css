@@ -34,6 +34,30 @@ input {
   background-color: #F3F3F3;
 }
 
+.image-container {
+  position: relative;
+  width: 1024px;
+  height: 684px;
+}
+.image-container .after {float: left;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  background-color: #92AD40;
+  padding: 5px;
+  color: #FFFFFF;
+}
+
+#circle {
+  width: 50px;
+  height: 50px;
+  -webkit-border-radius: 25px;
+  -moz-border-radius: 25px;
+  border-radius: 25px;
+  background: red;
+}
+
 .heading {
   color: white;
   position: absolute;

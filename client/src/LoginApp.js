@@ -14,7 +14,9 @@ class LoginApp extends Component {
     office: '',
     error: '',
     possibleOffices: [],
-    text: ''
+    text: '',
+    x: 150,
+    y: 50,
   };
 
   async componentDidMount() {
@@ -99,6 +101,31 @@ class LoginApp extends Component {
     if (!this.state.loggedIn) {
       return (
         <div className="LoginApp">
+          <div>
+          <div className="image-container">
+            <img src="https://c1.staticflickr.com/5/4052/4503898393_303cfbc9fd_b.jpg" useMap="#workmap"/>
+
+            <div id="circle" style={
+              {
+                width: 50,
+                height: 50,
+                "border-radius": 25,
+                "background": "red",
+
+                float: "left",
+                position: "absolute",
+                left: this.state.x,
+                top: this.state.y,
+                "z-index": 1000,
+              }
+            }/>
+            <map name="workmap">
+              <area shape="rect" coords="100,100,100,100" alt="Computer"/>
+              <area shape="rect" coords="250,250,50,50" alt="Phone"/>
+              <area shape="circle" coords="350,350,50" alt="Coffee"/>
+            </map>
+          </div>
+          </div>
           <h3>Hey, Are You Finished With That?</h3>
           <form onSubmit={this.logIn}>
             <input
