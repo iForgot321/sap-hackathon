@@ -120,16 +120,20 @@ class LoginApp extends Component {
     } else {
       return (
         <div className="MainPage">
-          <div className="container-fluid">
-            <div className="d-flex flex-row justify-content-between">
-              <h2 className="pb-4">Welcome to the SAP {this.state.office} office!</h2>
-              <form onSubmit={this.logOut}>
-                <button className="btn btn-primary" type="submit">
-                  <i className="bi bi-door-open-fill me-2"></i>
-                  Check out
-                </button>
-              </form>
+          <div className="parallax position-relative">
+            <div className="heading">
+              <div className="d-flex flex-row vw-100 px-5 justify-content-between">
+                <h2 className="py-4">Welcome to the SAP {this.state.office} office!</h2>
+                <form onSubmit={this.logOut}>
+                  <button className="btn btn-danger" type="submit">
+                    <i className="bi bi-door-open-fill me-2"></i>
+                    Check out
+                  </button>
+                </form>
+              </div>
             </div>
+          </div>
+          <div className="container-fluid py-4 px-5">
             <div className="row">
               <div className="col-8">
                 <AmenitiesList uname={this.state.uname} office={this.state.office}/>

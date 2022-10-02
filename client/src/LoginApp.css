@@ -9,7 +9,6 @@
 .MainPage {
   display: flex;
   flex-direction: column;
-  margin: 2em;
   white-space: pre;
 }
 
@@ -33,4 +32,25 @@ input {
   border-radius: 0.4em;
   border: 0;
   background-color: #F3F3F3;
+}
+
+.heading {
+  color: white;
+  position: absolute;
+  bottom: 0;
+  background-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.6));
+}
+
+.parallax {
+  /* The image used */
+  background-image: url("https://www.telegraph.co.uk/content/dam/Travel/2017/March/vancouver-AP.jpg");
+
+  /* Set a specific height */
+  min-height: 400px;
+
+  /* Create the parallax scrolling effect */
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
