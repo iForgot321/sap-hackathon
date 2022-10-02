@@ -251,6 +251,10 @@ class Amenity extends Component {
                                         <span className="badge text-bg-success ms-2">Full</span>
                                     }
                                 </h5>
+
+                                <button className="btn btn-primary" type="button" data-bs-toggle="offcanvas"
+                                        data-bs-target="#amenitystats" aria-controls="amenitystats" onClick={() => this.onStatsLoad()}>Stats
+                                </button>
                                 {
                                     here ?
                                         <button className="btn btn-danger" onClick={() => this.onLogout(amenity)}>Tap out
