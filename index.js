@@ -3,7 +3,8 @@ const cors = require('cors');
 const path = require('path');
 
 const {createDatabase, createTables, login, getOffices, logout, getOfficeUsers, getAmenities, joinAmenity, getUser, leaveAmenity, getAmenityLogs,
-  getAmenityTopUsers
+  getAmenityTopUsers,
+  getAmenity
 } = require("./database");
 
 const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -105,13 +106,25 @@ app.post('/api/amenities/login/:amenity', cors(), async(req, res, next) => {
   const amenity = req.params.amenity;
   const user_id = req.body.uname;
 
-  joinAmenity(user_id, amenity).then((result) => {
-    if (result) {
-      res.json({success: true});
-    } else {
+  getAmenity(amenity).then((result) => {
+    if (result === undefined) {
       res.json({success: false, message: "Database Error"});
+      return;
     }
-  });
+
+    if (result.rowCount === 0 || result.rows[0] === 0 || result.rows[0] > result.rowCount) {
+      joinAmenity(user_id, amenity).then((result2) => {
+        if (result2) {
+          res.json({success: true});
+        } else {
+          res.json({success: false, message: "Database Error"});
+        }
+      });
+    } else {
+      res.json({success: false, message: "Capacity Reached"});
+      return;
+    }
+  })
 });
 
 app.post('/api/logout', cors(), async(req, res, next) => {

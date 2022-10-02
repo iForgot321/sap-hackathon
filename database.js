@@ -248,6 +248,22 @@ module.exports.getAmenities = async (office) => {
     }
 }
 
+module.exports.getAmenity = async (amenity) => {
+    const clientDB = await pool.connect();
+    try {
+        console.log("getting amenity " + amenity);
+        const query = `SELECT capacity FROM amenities a RIGHT JOIN users u on a.amenity_id = u.amenity_id WHERE a.amenity_id=${amenity};`;
+        console.log(query);
+        const result = await clientDB.query(query);
+        return result;
+    } catch (error) {
+        console.error(error.stack);
+        return undefined;
+    } finally {
+        clientDB.release();
+    }
+}
+
 module.exports.joinAmenity = async (user_id, amenity) => {
     const clientDB = await pool.connect();
     try {
