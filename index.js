@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 
-const {createDatabase, createTables, login, getOffices, logout} = require("./database");
+const {createDatabase, createTables, login, getOffices, logout, getOfficeUsers, getAmenities, joinAmenity, getUser} = require("./database");
 
 createDatabase().then((result) => {
   if (result) {
@@ -17,7 +17,7 @@ createDatabase().then((result) => {
   }
 });
 
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 // Create the server
 const app = express();
 
@@ -83,12 +83,55 @@ let amenities = [
 app.use(express.static(path.join(__dirname, 'client/build')));
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 
-app.get('/api/amenities/:office', cors(), async(req, res, next) => {
-  try {
-    res.json({amenities});
-  } catch (err) {
-    next(err)
-  }
+app.post('/api/amenities/:office', cors(), async(req, res, next) => {
+  const office = req.params.office;
+  const user_id = req.body.uname;
+
+  getAmenities(office).then((result) => {
+    if (result === undefined) {
+      res.json({success: false, message: "Database Error"});
+      return;
+    }
+
+    let body = {
+      success: true,
+      amenities: []
+    };
+    for (let i = 0; i < result.rowCount; i++) {
+      const r = result.rows[i];
+      if (i !== 0 && result.rows[i].a_id === result.rows[i-1].a_id) {
+        body.amenities[body.amenities.length - 1].people.push({
+          email: r.u_id,
+          name: r.u_name,
+          image: r.u_image
+        });
+        if (r.u_id === user_id) {
+          body.amenities[body.amenities.length-1].here = true;
+        }
+      } else {
+        body.amenities.push({
+          id: r.a_id,
+          name: r.a_name,
+          room: r.r_name,
+          image: r.image,
+          capacity: r.capacity,
+          here: false,
+          people: []
+        });
+        if (r.u_id) {
+          body.amenities[body.amenities.length-1].people.push({
+            email: r.u_id,
+            name: r.u_name,
+            image: r.u_image
+          })
+          if (r.u_id === user_id) {
+            body.amenities[body.amenities.length-1].here = true;
+          }
+        }
+      }
+    }
+    res.json(body);
+  });
 });
 
 app.post('/api/login', cors(), async(req, res, next) => {
@@ -112,23 +155,16 @@ app.post('/api/login', cors(), async(req, res, next) => {
     });
 });
 app.post('/api/amenities/login/:amenity', cors(), async(req, res, next) => {
-  try {
-    const amenity = req.params.amenity;
-    const uname = req.body.uname;
-    let index = amenities.findIndex((what) => what['id'] == amenity);
-    if (index >= 0) {
-      amenities[index].people.push({
-        'email': uname,
-        'name': 'your mom',
-        'image': 'https://thumbs.dreamstime.com/b/profile-picture-caucasian-male-employee-posing-office-happy-young-worker-look-camera-workplace-headshot-portrait-smiling-190186649.jpg',
-      });
-      res.json({success: true, amenities: amenities});
+  const amenity = req.params.amenity;
+  const user_id = req.body.uname;
+
+  joinAmenity(user_id, amenity).then((result) => {
+    if (result) {
+      res.json({success: true});
     } else {
-      res.json({success: false});
+      res.json({success: false, message: "Database Error"});
     }
-  } catch (err) {
-    next(err);
-  }
+  });
 });
 
 app.post('/api/logout', cors(), async(req, res, next) => {
@@ -143,24 +179,34 @@ app.post('/api/logout', cors(), async(req, res, next) => {
 });
 
 app.post('/api/amenities/logout/:amenity', cors(), async(req, res, next) => {
-  try {
-    const amenity = req.params.amenity;
-    const uname = req.body.uname;
-    let index = amenities.findIndex((what) => what['id'] == amenity);
-    if (index >= 0) {
-      let personIndex = amenities[index].people.findIndex(person => person.email === uname);
-      if (personIndex === -1) {
-        res.json({success: false});
-      } else {
-        amenities[index].people.splice(personIndex, 1);
-        res.json({success: true, amenities: amenities});
-      }
+  const user_id = req.body.uname;
+
+  joinAmenity(user_id).then((result) => {
+    if (result) {
+      res.json({success: true});
     } else {
-      res.json({success: false});
+      res.json({success: false, message: "Database Error"});
     }
-  } catch (err) {
-    next(err);
-  }
+  });
+});
+
+app.get('/api/user/:user', cors(), async(req, res, next) => {
+  const user_id = req.params.user;
+
+  getUser(user_id).then((result) => {
+    if (result === undefined) {
+      res.json({success: false, message: "Database Error"});
+      return;
+    }
+
+    const body = {
+      success: true,
+      name: result.rows[0].name,
+      image: result.rows[0].picture_url,
+    }
+    console.log(body);
+    res.json(body);
+  });
 });
 
 app.get('/api/offices', cors(), async(req, res, next) => {
@@ -180,110 +226,19 @@ app.get('/api/offices', cors(), async(req, res, next) => {
 });
 
 app.get('/api/online/:office', cors(), async(req, res, next) => {
-  try {
-    const office = req.params.office;
-    res.json({success: true, people: [
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://st.depositphotos.com/1727324/1320/i/600/depositphotos_13209360-stock-photo-square-canvas-on-a-stretcher.jpg",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png"
-        },{
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://st.depositphotos.com/1727324/1320/i/600/depositphotos_13209360-stock-photo-square-canvas-on-a-stretcher.jpg",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png"
-        },{
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://st.depositphotos.com/1727324/1320/i/600/depositphotos_13209360-stock-photo-square-canvas-on-a-stretcher.jpg",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png"
-        },{
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://st.depositphotos.com/1727324/1320/i/600/depositphotos_13209360-stock-photo-square-canvas-on-a-stretcher.jpg",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png"
-        },{
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://st.depositphotos.com/1727324/1320/i/600/depositphotos_13209360-stock-photo-square-canvas-on-a-stretcher.jpg",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png"
-        },{
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://st.depositphotos.com/1727324/1320/i/600/depositphotos_13209360-stock-photo-square-canvas-on-a-stretcher.jpg",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png",
-          room: "Game Room"
-        },
-        {
-          name: "John Doe",
-          id: "johndoe@example.com",
-          image: "https://z0rb14n.github.io/images/cat.png"
-        },
-      ]});
-  } catch (err) {
-    next(err)
-  }
+  const office = req.params.office;
+  getOfficeUsers(office).then((result) => {
+    if (result === undefined) {
+      res.json({success: false, message: "Database Error"});
+      return;
+    }
+
+    const body = {
+      success: true,
+      people: result.rows
+    }
+    res.json(body);
+  });
 });
 
 // Anything that doesn't match the above, send back the index.html file

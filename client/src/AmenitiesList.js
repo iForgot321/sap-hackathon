@@ -6,46 +6,58 @@ class AmenitiesList extends Component {
         amenities: [],
         availability: "available",
         searchString: "",
-        amenityLoggedIn: null,
     };
 
     async componentDidMount() {
-        await this.fetchAmenities()
+        await this.fetchAmenities();
     }
 
-    preLogout() {
-        this.setState({amenityLoggedIn: null});
-    }
+    async updateFromResponse(res) {
+        let newState = this.state.amenities;
 
-    async preLogin(amenity) {
-        if (this.state.amenityLoggedIn !== null) {
-            const requestOptions = {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    uname: this.props.uname
-                })
-            };
-            const response = await fetch('/api/amenities/logout/' + this.state.amenityLoggedIn['id'], requestOptions);
-            const custom = await response.json();
-            if (!custom.success) {
-                alert("O NO");
-                console.log("o no logout on login failed");
+        if (res.isTapIn) {
+            newState[res.index].here = true;
+            for (let i = 0; i < newState.length; i++) {
+                let b = false;
+                for (let j = 0; j < newState[i].people.length; j++) {
+                    if (newState[i].people[j].name === this.props.name) {
+                        newState[i].people.splice(j, 1);
+                        newState[i].here = false;
+                        b = true;
+                        break;
+                    }
+                }
+                if (b) {
+                    break;
+                }
+            }
+            newState[res.index].people.push({
+                name: this.props.name,
+                email: this.props.uname,
+                image: this.props.image
+            });
+        } else {
+            newState[res.index].here = false;
+            for (let i = 0; i < newState[res.index].people.length; i++) {
+                if (newState[res.index].people[i].name === this.props.name) {
+                    newState[res.index].people.splice(i, 1);
+                    break;
+                }
             }
         }
-        this.setState({amenityLoggedIn: amenity});
-    }
-
-    updateFromResponse(json) {
-        if (json.success) {
-            this.setState({amenities: json.amenities});
-        } else {
-            alert("O NO");
-        }
+        this.setState({amenities: newState});
     }
 
     fetchAmenities = async () => {
-        const response = await fetch(`/api/amenities/` + this.props.office);
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                    uname: this.props.uname
+                }
+            )};
+        const response = await fetch('/api/amenities/' + this.props.office, requestOptions);
+
         const responseJson = await response.json();
         const amenities = responseJson.amenities;
         this.setState({amenities: amenities});
@@ -55,17 +67,7 @@ class AmenitiesList extends Component {
         const searchString = this.state.searchString;
         const availability = this.state.availability;
 
-        const amenities = [...this.state.amenities];
-
-        // Take out pinned amenity
-        const indexOfCurrent = amenities.findIndex(amenity => amenity.people.some(person => person.email === this.props.uname));
-        const pinnedAmenities = [];
-        if (indexOfCurrent >= 0){
-            pinnedAmenities.push(amenities[indexOfCurrent]);
-            amenities.splice(indexOfCurrent, 1);
-        }
-
-        const filteredByName = amenities.filter((amenity) => {
+        const filteredByName = this.state.amenities.filter((amenity) => {
             return !searchString || amenity.name.toLowerCase().includes(searchString.toLowerCase());
         });
         const filteredByAvailability = filteredByName.filter((amenity) => {
@@ -90,8 +92,8 @@ class AmenitiesList extends Component {
                         onChange={(evt) => this.setState({availability: evt.target.value})}
                     >
                         <option value={""}>All</option>
-                        <option value={"available"}>Not yet full</option>
-                        <option value={"unavailable"}>Full</option>
+                        <option value={"available"}>Full</option>
+                        <option value={"unavailable"}>Not yet full</option>
                     </select>
                     <input
                         className="form-control"
@@ -104,29 +106,8 @@ class AmenitiesList extends Component {
                 <div className="px-3 py-2 overflow-scroll" style={{height: "30em"}}>
                     <div>
                         {
-                            pinnedAmenities.map((amenity) => (
-                                <Amenity
-                                    key={amenity.id}
-                                    amenity={amenity}
-                                    here={true}
-                                    uname={this.props.uname}
-                                    callback={(json) => this.updateFromResponse(json)}
-                                    prelogcallback={async () => await this.preLogin(amenity)}
-                                    preoutcallback={() => this.preLogout()}
-                                />
-                            ))
-                        }
-                        {
-                            finalAmenitiesList.map((amenity) => (
-                                <Amenity
-                                    key={amenity.id}
-                                    amenity={amenity}
-                                    here={false}
-                                    uname={this.props.uname}
-                                    callback={(json) => this.updateFromResponse(json)}
-                                    prelogcallback={async () => await this.preLogin(amenity)}
-                                    preoutcallback={() => this.preLogout()}
-                                />
+                            finalAmenitiesList.map((amenity, index) => (
+                                <Amenity index={index} key={amenity.id} amenity={amenity} here={amenity.here} uname={this.props.uname} callback={(res) => this.updateFromResponse(res)}/>
                             ))
                         }
                     </div>
@@ -142,7 +123,6 @@ class AmenitiesList extends Component {
 class Amenity extends Component {
 
     async onLogout() {
-        this.props.preoutcallback();
         const requestOptions = {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -152,21 +132,26 @@ class Amenity extends Component {
             )};
         const response = await fetch('/api/amenities/logout/' + this.props.amenity['id'], requestOptions);
         const custom = await response.json();
-        this.props.callback(custom);
+        this.props.callback({
+            index: this.props.index,
+            isTapIn: false
+        });
     }
 
     async onLogin() {
-        await this.props.prelogcallback();
         const requestOptions = {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-                  uname: this.props.uname
-              }
+                uname: this.props.uname
+            }
             )};
         const response = await fetch('/api/amenities/login/' + this.props.amenity['id'], requestOptions);
         const custom = await response.json();
-        this.props.callback(custom);
+        this.props.callback({
+            index: this.props.index,
+            isTapIn: true
+        });
     }
     render() {
         const amenity = this.props.amenity;
@@ -203,11 +188,11 @@ class Amenity extends Component {
                                 </h5>
                                 {
                                     here ?
-                                        <button className="btn btn-danger" onClick={() => this.onLogout(amenity)}>Tap out
+                                        <button className="btn btn-sm btn-danger" onClick={() => this.onLogout(amenity)}>Tap out
                                             <i className="bi bi-box-arrow-right ms-1"></i>
                                         </button> :
                                         canTapIn ?
-                                            <button className="btn btn-primary" onClick={() => this.onLogin(amenity)}>Tap in
+                                            <button className="btn btn-sm btn-primary" onClick={() => this.onLogin(amenity)}>Tap in
                                                 <i className="bi bi-box-arrow-in-right ms-1"></i>
                                             </button> :
                                             null
