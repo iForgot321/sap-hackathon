@@ -1,11 +1,12 @@
 const { Client, Pool } = require('pg');
 
 const databaseFromConfig = process.env.DATABASE_URL;
-
+const heroku = !!databaseFromConfig;
 
 let client = null;
 let pool = null;
-if (databaseFromConfig) {
+let dbname = heroku ? databaseFromConfig.split('/').pop() : 'sapdb';
+if (heroku) {
     client = new Client({
         connectionString: process.env.DATABASE_URL,
         ssl: {
@@ -17,7 +18,7 @@ if (databaseFromConfig) {
         ssl: {
             rejectUnauthorized: false
         },
-        database: 'sapdb', // name of the database
+        database: dbname, // name of the database
         max: 10, // max number of clients in the pool
         idleTimeoutMillis: 30000
     });
@@ -30,7 +31,7 @@ if (databaseFromConfig) {
     });
     pool = new Pool({
         user: 'postgres', // name of the user account
-        database: 'sapdb', // name of the database
+        database: dbname, // name of the database
         max: 10, // max number of clients in the pool
         idleTimeoutMillis: 30000
     });
@@ -118,10 +119,14 @@ module.exports.createTables = async () => {
 };
 
 module.exports.createDatabase = async () => {
+    if (heroku) {
+        return true;
+    }
+
     try {
         console.log("Creating database...");
         await client.connect();                            // gets connection
-        await client.query('CREATE DATABASE sapdb'); // sends queries
+        await client.query(`CREATE DATABASE ${dbname}`); // sends queries
         return true;
     } catch (error) {
         if (error.stack.includes("already exists")) {
