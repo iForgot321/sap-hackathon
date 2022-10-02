@@ -142,7 +142,7 @@ class LoginApp extends Component {
                 <AmenitiesList uname={this.state.uname} name={this.state.name} image={this.state.image} office={this.state.office}/>
               </div>
               <div className="col-4">
-                <PeopleList office={this.state.office}/>
+                <PeopleList uname={this.state.uname} office={this.state.office}/>
               </div>
             </div>
           </div>

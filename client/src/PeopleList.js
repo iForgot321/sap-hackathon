@@ -42,7 +42,7 @@ class PeopleList extends Component {
         <hr/>
         <div className="overflow-scroll" style={{height: "27em"}}>
           {
-            this.state.displayedPeople.map((person) => (
+            this.state.displayedPeople.filter((person) => person.id !== this.props.uname).map((person) => (
               <Person key={person.id} person={person}/>
             ))
           }
