@@ -267,10 +267,14 @@ module.exports.getAmenity = async (amenity) => {
 module.exports.joinAmenity = async (user_id, amenity) => {
     const clientDB = await pool.connect();
     try {
-        console.log("user " + user_id + " joining amentity " + amenity);
-        const query2 = 'UPDATE users SET amenity_id=\'' + amenity + '\' WHERE user_id=\''+user_id+'\';';
+        console.log("user " + user_id + " joining amenity " + amenity);
+        const query = 'UPDATE users SET amenity_id=\'' + amenity + '\' WHERE user_id=\''+user_id+'\';';
+        console.log(query);
+        await clientDB.query(query);
+
+        const query2 = `INSERT INTO activity_log (amenity_id, user_id, date) VALUES (${amenity}, '${user_id}', $1);`;
         console.log(query2);
-        await clientDB.query(query2);
+        await clientDB.query(query2, [new Date()]);
         return true;
     } catch (error) {
         console.error(error.stack);
