@@ -25,12 +25,10 @@ class LoginApp extends Component {
   fetchExistingSession = async () => {
     const existingUsername = localStorage.getItem(this.STORED_USERNAME_KEY);
     const existingOffice = localStorage.getItem(this.STORED_OFFICE_KEY);
-    console.log(existingOffice);
     if (existingUsername) {
       const response = await fetch(`/api/user/` + existingUsername);
       const responseJson = await response.json();
       if (existingUsername && existingOffice) {
-        console.log(responseJson.office_image);
         this.setState({uname: existingUsername, name: responseJson.name, image: responseJson.image, text: '', loggedIn: true, office: existingOffice, office_url: responseJson.office_image});
       }
     }
@@ -44,6 +42,7 @@ class LoginApp extends Component {
   };
 
   logIn = async evt => {
+    const actualOffice = document.getElementById('office').value;
     evt.preventDefault();
     const text = this.state.text;
     if (this.state.text === '') {
@@ -55,16 +54,15 @@ class LoginApp extends Component {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
           user_id: text,
-          office: this.state.office
+          office: actualOffice
       }
       )};
     const response = await fetch('/api/login/', requestOptions);
     const responseJson = await response.json();
     if (responseJson.success) {
-      console.log(responseJson.office_image);
       this.setState({uname: text, name: responseJson.name, text: '', loggedIn: true, office_url: responseJson.office_image});
       localStorage.setItem(this.STORED_USERNAME_KEY, text);
-      localStorage.setItem(this.STORED_OFFICE_KEY, this.state.office);
+      localStorage.setItem(this.STORED_OFFICE_KEY, actualOffice);
     } else {
       alert(responseJson.message);
     }
