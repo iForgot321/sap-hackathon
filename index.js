@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 
-const {createDatabase, createTables, login, getOffices, logout, getOfficeUsers, getAmenities} = require("./database");
+const {createDatabase, createTables, login, getOffices, logout, getOfficeUsers, getAmenities, joinAmenity, getUser} = require("./database");
 
 createDatabase().then((result) => {
   if (result) {
@@ -83,8 +83,9 @@ let amenities = [
 app.use(express.static(path.join(__dirname, 'client/build')));
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 
-app.get('/api/amenities/:office', cors(), async(req, res, next) => {
+app.post('/api/amenities/:office', cors(), async(req, res, next) => {
   const office = req.params.office;
+  const user_id = req.body.uname;
 
   getAmenities(office).then((result) => {
     if (result === undefined) {
@@ -104,6 +105,12 @@ app.get('/api/amenities/:office', cors(), async(req, res, next) => {
           name: r.u_name,
           image: r.u_image
         });
+        console.log(r.u_id)
+        console.log(user_id)
+        console.log("______")
+        if (r.u_id === user_id) {
+          body.amenities[body.amenities.length-1].here = true;
+        }
       } else {
         body.amenities.push({
           id: r.a_id,
@@ -111,19 +118,24 @@ app.get('/api/amenities/:office', cors(), async(req, res, next) => {
           room: r.r_name,
           image: r.image,
           capacity: r.capacity,
+          here: false,
           people: []
         });
         if (r.u_id) {
-          console.log(r.u_id);
           body.amenities[body.amenities.length-1].people.push({
             email: r.u_id,
             name: r.u_name,
             image: r.u_image
           })
+          console.log(r.u_id)
+          console.log(user_id)
+          console.log("______")
+          if (r.u_id === user_id) {
+            body.amenities[body.amenities.length-1].here = true;
+          }
         }
       }
     }
-    console.log(body);
     res.json(body);
   });
 });
@@ -149,23 +161,16 @@ app.post('/api/login', cors(), async(req, res, next) => {
     });
 });
 app.post('/api/amenities/login/:amenity', cors(), async(req, res, next) => {
-  try {
-    const amenity = req.params.amenity;
-    const uname = req.body.uname;
-    let index = amenities.findIndex((what) => what['id'] == amenity);
-    if (index >= 0) {
-      amenities[index].people.push({
-        'email': uname,
-        'name': 'your mom',
-        'image': 'https://thumbs.dreamstime.com/b/profile-picture-caucasian-male-employee-posing-office-happy-young-worker-look-camera-workplace-headshot-portrait-smiling-190186649.jpg',
-      });
-      res.json({success: true, amenities: amenities});
+  const amenity = req.params.amenity;
+  const user_id = req.body.uname;
+
+  joinAmenity(user_id, amenity).then((result) => {
+    if (result) {
+      res.json({success: true});
     } else {
-      res.json({success: false});
+      res.json({success: false, message: "Database Error"});
     }
-  } catch (err) {
-    next(err);
-  }
+  });
 });
 
 app.post('/api/logout', cors(), async(req, res, next) => {
@@ -180,24 +185,34 @@ app.post('/api/logout', cors(), async(req, res, next) => {
 });
 
 app.post('/api/amenities/logout/:amenity', cors(), async(req, res, next) => {
-  try {
-    const amenity = req.params.amenity;
-    const uname = req.body.uname;
-    let index = amenities.findIndex((what) => what['id'] == amenity);
-    if (index >= 0) {
-      let personIndex = amenities[index].people.findIndex(person => person.email === uname);
-      if (personIndex === -1) {
-        res.json({success: false});
-      } else {
-        amenities[index].people.splice(personIndex, 1);
-        res.json({success: true, amenities: amenities});
-      }
+  const user_id = req.body.uname;
+
+  joinAmenity(user_id).then((result) => {
+    if (result) {
+      res.json({success: true});
     } else {
-      res.json({success: false});
+      res.json({success: false, message: "Database Error"});
     }
-  } catch (err) {
-    next(err);
-  }
+  });
+});
+
+app.get('/api/user/:user', cors(), async(req, res, next) => {
+  const user_id = req.params.user;
+
+  getUser(user_id).then((result) => {
+    if (result === undefined) {
+      res.json({success: false, message: "Database Error"});
+      return;
+    }
+
+    const body = {
+      success: true,
+      name: result.rows[0].name,
+      image: result.rows[0].picture_url,
+    }
+    console.log(body);
+    res.json(body);
+  });
 });
 
 app.get('/api/offices', cors(), async(req, res, next) => {
@@ -228,7 +243,6 @@ app.get('/api/online/:office', cors(), async(req, res, next) => {
       success: true,
       people: result.rows
     }
-    console.log(body);
     res.json(body);
   });
 });

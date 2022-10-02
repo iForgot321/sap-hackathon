@@ -9,6 +9,7 @@ class LoginApp extends Component {
 
   state = {
     uname: '',
+    name: '',
     loggedIn: false,
     office: '',
     error: '',
@@ -17,15 +18,17 @@ class LoginApp extends Component {
   };
 
   async componentDidMount() {
-    this.fetchExistingSession()
+    await this.fetchExistingSession();
     await this.fetchOffices()
   }
 
-  fetchExistingSession = () => {
+  fetchExistingSession = async () => {
     const existingUsername = localStorage.getItem(this.STORED_USERNAME_KEY);
     const existingOffice = localStorage.getItem(this.STORED_OFFICE_KEY);
+    const response = await fetch(`/api/user/` + existingUsername);
+    const responseJson = await response.json();
     if (existingUsername && existingOffice) {
-      this.setState({uname: existingUsername, text: '', loggedIn: true, office: existingOffice});
+      this.setState({uname: existingUsername, name: responseJson.name, image: responseJson.image, text: '', loggedIn: true, office: existingOffice});
     }
   }
 
@@ -54,7 +57,7 @@ class LoginApp extends Component {
     const response = await fetch('/api/login/', requestOptions);
     const responseJson = await response.json();
     if (responseJson.success) {
-      this.setState({uname: text, text: '', loggedIn: true});
+      this.setState({uname: text, name: responseJson.name, text: '', loggedIn: true});
       localStorage.setItem(this.STORED_USERNAME_KEY, text);
       localStorage.setItem(this.STORED_OFFICE_KEY, this.state.office);
     } else {
@@ -122,7 +125,7 @@ class LoginApp extends Component {
         <div className="MainPage">
           <div className="container-fluid">
             <div className="d-flex flex-row justify-content-between">
-              <h2 className="pb-4">Welcome to the SAP {this.state.office} office!</h2>
+              <h2 className="pb-4">Hey {this.state.name}, welcome to the SAP {this.state.office} office!</h2>
               <form onSubmit={this.logOut}>
                 <button className="btn btn-primary" type="submit">
                   <i className="bi bi-door-open-fill me-2"></i>
@@ -132,7 +135,7 @@ class LoginApp extends Component {
             </div>
             <div className="row">
               <div className="col-8">
-                <AmenitiesList uname={this.state.uname} office={this.state.office}/>
+                <AmenitiesList uname={this.state.uname} name={this.state.name} image={this.state.image} office={this.state.office}/>
               </div>
               <div className="col-4">
                 <PeopleList office={this.state.office}/>

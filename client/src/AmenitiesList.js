@@ -9,19 +9,58 @@ class AmenitiesList extends Component {
     };
 
     async componentDidMount() {
-        await this.fetchAmenities()
-    }
-
-    updateFromResponse(json) {
-        if (json.success) {
-            this.setState({amenities: json.amenities});
-        } else {
-            alert("O NO");
+        await this.fetchAmenities();
+        for (let i = 0; i < this.state.amenities.length; i++) {
+            console.log(this.state.amenities[i].here);
         }
     }
 
+    async updateFromResponse(res) {
+        let newState = this.state.amenities;
+
+        if (res.isTapIn) {
+            newState[res.index].here = true;
+            for (let i = 0; i < newState.length; i++) {
+                let b = false;
+                for (let j = 0; j < newState[i].people.length; j++) {
+                    if (newState[i].people[j].name === this.props.name) {
+                        newState[i].people.splice(j, 1);
+                        newState[i].here = false;
+                        b = true;
+                        break;
+                    }
+                }
+                if (b) {
+                    break;
+                }
+            }
+            newState[res.index].people.push({
+                name: this.props.name,
+                email: this.props.uname,
+                image: this.props.image
+            });
+        } else {
+            newState[res.index].here = false;
+            for (let i = 0; i < newState[res.index].people.length; i++) {
+                if (newState[res.index].people[i].name === this.props.name) {
+                    newState[res.index].people.splice(i, 1);
+                    break;
+                }
+            }
+        }
+        this.setState({amenities: newState});
+    }
+
     fetchAmenities = async () => {
-        const response = await fetch(`/api/amenities/` + this.props.office);
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                    uname: this.props.uname
+                }
+            )};
+        const response = await fetch('/api/amenities/' + this.props.office, requestOptions);
+
         const responseJson = await response.json();
         const amenities = responseJson.amenities;
         this.setState({amenities: amenities});
@@ -70,10 +109,8 @@ class AmenitiesList extends Component {
                 <div className="px-3 py-2 overflow-scroll" style={{height: "30em"}}>
                     <div>
                         {
-                            finalAmenitiesList.map((amenity) => (
-                                <Amenity key={amenity.id} amenity={amenity} here={
-                                    amenity['people'].findIndex(person => person.email === this.props.uname) >= 0
-                                } uname={this.props.uname} callback={(json) => this.updateFromResponse(json)}/>
+                            finalAmenitiesList.map((amenity, index) => (
+                                <Amenity index={index} key={amenity.id} amenity={amenity} here={amenity.here} uname={this.props.uname} callback={(res) => this.updateFromResponse(res)}/>
                             ))
                         }
                     </div>
@@ -98,7 +135,10 @@ class Amenity extends Component {
             )};
         const response = await fetch('/api/amenities/logout/' + this.props.amenity['id'], requestOptions);
         const custom = await response.json();
-        this.props.callback(custom);
+        this.props.callback({
+            index: this.props.index,
+            isTapIn: false
+        });
     }
 
     async onLogin() {
@@ -106,12 +146,15 @@ class Amenity extends Component {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-                  uname: this.props.uname
-              }
+                uname: this.props.uname
+            }
             )};
         const response = await fetch('/api/amenities/login/' + this.props.amenity['id'], requestOptions);
         const custom = await response.json();
-        this.props.callback(custom);
+        this.props.callback({
+            index: this.props.index,
+            isTapIn: true
+        });
     }
     render() {
         const amenity = this.props.amenity;

@@ -200,5 +200,52 @@ module.exports.getAmenities = async (office) => {
     }
 }
 
+module.exports.joinAmenity = async (user_id, amenity) => {
+    const clientDB = await pool.connect();
+    try {
+        console.log("user " + user_id + " joining amentity " + amenity);
+        const query2 = 'UPDATE users SET amenity_id=\'' + amenity + '\' WHERE user_id=\''+user_id+'\';';
+        console.log(query2);
+        await clientDB.query(query2);
+        return true;
+    } catch (error) {
+        console.error(error.stack);
+        return false;
+    } finally {
+        clientDB.release();
+    }
+}
+
+module.exports.leaveAmenity = async (user_id) => {
+    const clientDB = await pool.connect();
+    try {
+        console.log("user " + user_id + " leaving amentity");
+        const query2 = 'UPDATE users SET amenity_id=NULL WHERE user_id=\''+user_id+'\';';
+        console.log(query2);
+        await clientDB.query(query2);
+        return true;
+    } catch (error) {
+        console.error(error.stack);
+        return false;
+    } finally {
+        clientDB.release();
+    }
+}
+
+module.exports.getUser = async (user_id) => {
+    const clientDB = await pool.connect();
+    try {
+        console.log("getting user " + user_id);
+        const query2 = 'SELECT * FROM users WHERE user_id=\''+user_id+'\';';
+        console.log(query2);
+        const result = await clientDB.query(query2);
+        return result;
+    } catch (error) {
+        console.error(error.stack);
+        return undefined;
+    } finally {
+        clientDB.release();
+    }
+}
 
 
