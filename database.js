@@ -303,4 +303,8 @@ module.exports.getUser = async (user_id) => {
     }
 }
 
+module.exports.getAmenityStatistics = async (amenity) => {
+
+}
+
 
