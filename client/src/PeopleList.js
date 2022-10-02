@@ -4,11 +4,23 @@ class PeopleList extends Component {
   state = {
     searchtext: '',
     people: [],
-    displayedPeople: []
+    displayedPeople: [],
+    updateTimer: 0,
   };
 
   async componentDidMount() {
-    await this.fetchOnline()
+    // Queue up calls
+    const timer = setInterval(async () => {
+      await this.fetchOnline();
+    }, 5 * 1000);
+    this.setState({updateTimer: timer});
+
+    // First call
+    await this.fetchOnline();
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.state.updateTimer);
   }
 
   fetchOnline = async () => {
