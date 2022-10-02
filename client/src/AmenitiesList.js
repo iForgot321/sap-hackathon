@@ -6,23 +6,12 @@ class AmenitiesList extends Component {
         amenities: [],
         availability: "available",
         searchString: "",
-        updateTimer: 0,
     };
 
     async componentDidMount() {
-        // Queue up calls
-        const timer = setInterval(async () => {
-            await this.fetchAmenities();
-        }, 5 * 1000);
-        this.setState({updateTimer: timer});
-
-        // First call
         await this.fetchAmenities();
     }
 
-    componentWillUnmount() {
-        clearInterval(this.state.updateTimer);
-    }
 
     async updateFromResponse(res) {
         let newState = this.state.amenities;
@@ -79,10 +68,15 @@ class AmenitiesList extends Component {
         const searchString = this.state.searchString;
         const availability = this.state.availability;
 
+        // Always include the tapped-in amenity in the list
         const filteredByName = this.state.amenities.filter((amenity) => {
-            return !searchString || amenity.name.toLowerCase().includes(searchString.toLowerCase());
+            return amenity.here || !searchString || amenity.name.toLowerCase().includes(searchString.toLowerCase());
         });
         const filteredByAvailability = filteredByName.filter((amenity) => {
+            if (amenity.here) {
+                return true;
+            }
+
             if (availability === "available") {
                 // capacity = 0 means unlimited
                 return !amenity.capacity || amenity.people.length < amenity.capacity;
