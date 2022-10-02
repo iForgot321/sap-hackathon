@@ -135,7 +135,7 @@ class LoginApp extends Component {
                 <h2 className="py-4">Hey {this.state.name}, welcome to the SAP {this.state.office} office!</h2>
                 <div className="d-flex flex-row gap-4">
                   <form onSubmit={this.refresh}>
-                    <button className="btn btn-primary" type="submit">
+                    <button className="btn btn-light" type="submit">
                       <i className="bi bi-arrow-clockwise me-2"></i>
                       Refresh
                     </button>
