@@ -25,10 +25,12 @@ class LoginApp extends Component {
   fetchExistingSession = async () => {
     const existingUsername = localStorage.getItem(this.STORED_USERNAME_KEY);
     const existingOffice = localStorage.getItem(this.STORED_OFFICE_KEY);
-    const response = await fetch(`/api/user/` + existingUsername);
-    const responseJson = await response.json();
-    if (existingUsername && existingOffice) {
-      this.setState({uname: existingUsername, name: responseJson.name, image: responseJson.image, text: '', loggedIn: true, office: existingOffice});
+    if (existingUsername) {
+      const response = await fetch(`/api/user/` + existingUsername);
+      const responseJson = await response.json();
+      if (existingUsername && existingOffice) {
+        this.setState({uname: existingUsername, name: responseJson.name, image: responseJson.image, text: '', loggedIn: true, office: existingOffice});
+      }
     }
   }
 
@@ -97,7 +99,7 @@ class LoginApp extends Component {
     if (!this.state.loggedIn) {
       return (
         <div className="LoginApp">
-          <h3>[name of app]</h3>
+          <h3>Hey, Are You Finished With That?</h3>
           <form onSubmit={this.logIn}>
             <input
               type="text"
