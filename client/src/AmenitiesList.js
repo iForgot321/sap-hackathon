@@ -10,9 +10,6 @@ class AmenitiesList extends Component {
 
     async componentDidMount() {
         await this.fetchAmenities();
-        for (let i = 0; i < this.state.amenities.length; i++) {
-            console.log(this.state.amenities[i].here);
-        }
     }
 
     async updateFromResponse(res) {
