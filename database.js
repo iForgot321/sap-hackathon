@@ -217,7 +217,15 @@ module.exports.getOfficeUsers = async (office) => {
     const clientDB = await pool.connect();
     try {
         console.log("getting list of users");
-        const query = 'SELECT u.name as name, u.user_id as id, u.picture_url as image, r.name as room FROM users u LEFT JOIN amenities a ON u.amenity_id=a.amenity_id LEFT JOIN rooms r ON r.room_id=a.room_id WHERE u.office_id=\'' + office + '\' ;';
+        const query = `
+            SELECT DISTINCT u.name as name, u.user_id as id, u.picture_url as image, r.name as room, a2.name as used_amenity_name
+            FROM users u
+            LEFT JOIN amenities a ON u.amenity_id=a.amenity_id
+            LEFT JOIN rooms r ON r.room_id=a.room_id
+            LEFT JOIN activity_log l ON l.user_id = u.user_id
+            LEFT JOIN amenities a2 ON l.amenity_id = a2.amenity_id
+            WHERE u.office_id='${office}';
+        `;
         console.log(query);
         const result = await clientDB.query(query);
         return result;

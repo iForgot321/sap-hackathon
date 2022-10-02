@@ -176,9 +176,25 @@ app.get('/api/online/:office', cors(), async(req, res, next) => {
       return;
     }
 
+    const userMap = {}
+    for (let user of result.rows) {
+      const userId = user.id;
+      if (userMap[userId] && user.used_amenity_name) {
+        userMap[userId].usedAmenities.push(user.used_amenity_name);
+      } else {
+        userMap[userId] = {
+          id: user.id,
+          name: user.name,
+          image: user.image,
+          room: user.room,
+          usedAmenities: user.used_amenity_name ? [user.used_amenity_name] : [],  // used_amenity_name may be null
+        };
+      }
+    }
+
     const body = {
       success: true,
-      people: result.rows
+      people: Object.values(userMap),
     }
     res.json(body);
   });
