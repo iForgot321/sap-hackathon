@@ -91,6 +91,7 @@ app.post('/api/login', cors(), async(req, res, next) => {
           success: true,
           name: result.rows[0].name,
           image: result.rows[0].picture_url,
+          office_image: result.rows[0].image_url
         }
         console.log(body);
         res.json(body);
@@ -146,6 +147,7 @@ app.get('/api/user/:user', cors(), async(req, res, next) => {
       success: true,
       name: result.rows[0].name,
       image: result.rows[0].picture_url,
+      office_image: result.rows[0].image_url
     }
     console.log(body);
     res.json(body);

@@ -59,6 +59,7 @@ const userTable = `
 const officeTable = `
     CREATE TABLE IF NOT EXISTS "offices" (
 	    "office_id" VARCHAR(100) NOT NULL,
+	    "image_url" VARCHAR(500),
 	    PRIMARY KEY (office_id)
     );`;
 
@@ -165,14 +166,17 @@ module.exports.login = async (user_id, office) => {
     const clientDB = await pool.connect();
     try {
         console.log("logging in user " + user_id + " in office " + office);
-        const query = 'SELECT * FROM users WHERE user_id=\''+user_id+'\';';
+        const query = `SELECT * FROM users WHERE user_id='${user_id}';`;
         const result = await clientDB.query(query);
+        console.log(result);
         if (result.rowCount === 0) {
             return result;
         }
-        const query2 = 'UPDATE users SET office_id=\''+ office +'\' WHERE user_id=\''+user_id+'\';';
-        console.log(query2);
-        await clientDB.query(query2);
+        const query2 = `UPDATE users SET office_id='${office}' WHERE user_id='${user_id}';`;
+        const query3 = `SELECT image_url FROM offices WHERE office_id='${office}';`;
+        const result2 = await Promise.all([clientDB.query(query2), clientDB.query(query3)]);
+        console.log(result2[1]);
+        result.rows[0].image_url = result2[1].rows[0].image_url;
         return result;
     } catch (error) {
         console.error(error.stack);
@@ -296,7 +300,7 @@ module.exports.getUser = async (user_id) => {
     const clientDB = await pool.connect();
     try {
         console.log("getting user " + user_id);
-        const query2 = 'SELECT * FROM users WHERE user_id=\''+user_id+'\';';
+        const query2 = `SELECT * FROM users LEFT JOIN offices o on users.office_id = o.office_id WHERE user_id='${user_id}';`;
         console.log(query2);
         const result = await clientDB.query(query2);
         return result;

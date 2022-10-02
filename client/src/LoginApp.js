@@ -25,11 +25,13 @@ class LoginApp extends Component {
   fetchExistingSession = async () => {
     const existingUsername = localStorage.getItem(this.STORED_USERNAME_KEY);
     const existingOffice = localStorage.getItem(this.STORED_OFFICE_KEY);
+    console.log(existingOffice);
     if (existingUsername) {
       const response = await fetch(`/api/user/` + existingUsername);
       const responseJson = await response.json();
       if (existingUsername && existingOffice) {
-        this.setState({uname: existingUsername, name: responseJson.name, image: responseJson.image, text: '', loggedIn: true, office: existingOffice});
+        console.log(responseJson.office_image);
+        this.setState({uname: existingUsername, name: responseJson.name, image: responseJson.image, text: '', loggedIn: true, office: existingOffice, office_url: responseJson.office_image});
       }
     }
   }
@@ -38,7 +40,7 @@ class LoginApp extends Component {
     const response = await fetch(`/api/offices`);
     const responseJson = await response.json();
     const offices = responseJson.offices;
-    this.setState({ possibleOffices: offices, office: offices[0] });
+    this.setState({ possibleOffices: offices});
   };
 
   logIn = async evt => {
@@ -59,11 +61,12 @@ class LoginApp extends Component {
     const response = await fetch('/api/login/', requestOptions);
     const responseJson = await response.json();
     if (responseJson.success) {
-      this.setState({uname: text, name: responseJson.name, text: '', loggedIn: true});
+      console.log(responseJson.office_image);
+      this.setState({uname: text, name: responseJson.name, text: '', loggedIn: true, office_url: responseJson.office_image});
       localStorage.setItem(this.STORED_USERNAME_KEY, text);
       localStorage.setItem(this.STORED_OFFICE_KEY, this.state.office);
     } else {
-      alert("O NO");
+      alert(responseJson.message);
     }
   };
 
@@ -84,7 +87,7 @@ class LoginApp extends Component {
       localStorage.removeItem(this.STORED_USERNAME_KEY);
       localStorage.removeItem(this.STORED_OFFICE_KEY);
     } else {
-      alert("O NO");
+      alert(custom.message);
     }
   };
 
@@ -137,7 +140,7 @@ class LoginApp extends Component {
     } else {
       return (
         <div className="MainPage">
-          <div className="parallax position-relative">
+          <div className="parallax position-relative" style={{backgroundImage: "url('" + this.state.office_url + "')"}}>
             <div className="heading">
               <div className="d-flex flex-row vw-100 px-5 justify-content-between align-items-center">
                 <h2 className="py-4">Hey {this.state.name}, welcome to the SAP {this.state.office} office!</h2>
