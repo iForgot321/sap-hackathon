@@ -92,8 +92,8 @@ class AmenitiesList extends Component {
                         onChange={(evt) => this.setState({availability: evt.target.value})}
                     >
                         <option value={""}>All</option>
-                        <option value={"available"}>Full</option>
-                        <option value={"unavailable"}>Not yet full</option>
+                        <option value={"unavailable"}>Full</option>
+                        <option value={"available"}>Not yet full</option>
                     </select>
                     <input
                         className="form-control"
