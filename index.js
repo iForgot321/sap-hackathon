@@ -184,6 +184,20 @@ app.get('/api/online/:office', cors(), async(req, res, next) => {
   });
 });
 
+app.get('/api/amenities/stats/:amenity', cors(), async(req, res, next) => {
+  const body = {
+    success: true,
+    lastUsedTime: "Sat January 1, 2023",
+    lastUsedUser: 'John Doe',
+    popularDay: 'Wednesday',
+    topUsers: [
+      "Test One",
+      "Test Two",
+      "Peiyan Yang"
+    ]
+  }
+});
+
 // Anything that doesn't match the above, send back the index.html file
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname + '/client/build/index.html'))
