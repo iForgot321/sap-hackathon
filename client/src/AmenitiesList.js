@@ -393,7 +393,7 @@ class CurrentUsage extends Component {
                     />
                 }
                 <div className="card-text text-muted">
-                    <small className="ms-1">{this.getListOfNamesUsing()}</small>
+                    <small className={this.props.people.length && "ms-1"}>{this.getListOfNamesUsing()}</small>
                 </div>
             </div>
         );
