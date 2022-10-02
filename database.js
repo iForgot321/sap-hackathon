@@ -138,7 +138,7 @@ module.exports.logout = async (user_id) => {
     const clientDB = await pool.connect();
     try {
         console.log("logging out user " + user_id);
-        const query2 = 'UPDATE users SET office_id=NULL WHERE user_id=\''+user_id+'\';';
+        const query2 = 'UPDATE users SET office_id=NULL, amenity_id=NULL WHERE user_id=\''+user_id+'\';';
         console.log(query2);
         await clientDB.query(query2);
         return true;

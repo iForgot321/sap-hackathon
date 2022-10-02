@@ -105,9 +105,6 @@ app.post('/api/amenities/:office', cors(), async(req, res, next) => {
           name: r.u_name,
           image: r.u_image
         });
-        console.log(r.u_id)
-        console.log(user_id)
-        console.log("______")
         if (r.u_id === user_id) {
           body.amenities[body.amenities.length-1].here = true;
         }
@@ -127,9 +124,6 @@ app.post('/api/amenities/:office', cors(), async(req, res, next) => {
             name: r.u_name,
             image: r.u_image
           })
-          console.log(r.u_id)
-          console.log(user_id)
-          console.log("______")
           if (r.u_id === user_id) {
             body.amenities[body.amenities.length-1].here = true;
           }
