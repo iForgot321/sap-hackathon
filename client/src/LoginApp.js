@@ -38,7 +38,7 @@ class LoginApp extends Component {
     const response = await fetch(`/api/offices`);
     const responseJson = await response.json();
     const offices = responseJson.offices;
-    this.setState({ possibleOffices: offices});
+    this.setState({ possibleOffices: offices, office: offices[0]});
   };
 
   logIn = async evt => {
