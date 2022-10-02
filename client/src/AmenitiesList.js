@@ -203,8 +203,17 @@ class Amenity extends Component {
                 <p className="text-danger">{this.state.error}</p>
             </div>;
         } else {
+            let displayString = this.state.lastUsedTime;
+            let split = this.state.lastUsedTime.split("T")[0].split("-");
+            let last = new Date(parseInt(split[0]),parseInt(split[1])-1,parseInt(split[2]));
+            let now = new Date(new Date().toDateString());
+            if (now - last === 0) {
+                displayString = 'Today';
+            } else if (now - last === 1000*60*60*24) {
+                displayString = "Yesterday";
+            }
             offcanvas =<div>
-                <p>Last day used: {this.state.lastUsedTime}</p>
+                <p>Last day used: {displayString}</p>
                 <p>Last user: {this.state.lastUsedUser}</p>
                 <p>Most popular day: {this.state.popularDay}</p>
                 <p>Top Users: </p>
@@ -242,10 +251,6 @@ class Amenity extends Component {
                                         <span className="badge text-bg-success ms-2">Full</span>
                                     }
                                 </h5>
-
-                                <button className="btn btn-primary" type="button" data-bs-toggle="offcanvas"
-                                        data-bs-target="#amenitystats" aria-controls="amenitystats" onClick={() => this.onStatsLoad()}>Stats
-                                </button>
                                 {
                                     here ?
                                         <button className="btn btn-danger" onClick={() => this.onLogout(amenity)}>Tap out
@@ -260,6 +265,10 @@ class Amenity extends Component {
                             </div>
                             <h6 className="card-subtitle mb-2 fw-normal">Located in: {amenity.room}</h6>
                             <CurrentUsage people={amenity.people} />
+                            <br/>
+                            <button className="btn btn-secondary btn-sm" type="button" data-bs-toggle="offcanvas"
+                                    data-bs-target="#amenitystats" aria-controls="amenitystats" onClick={() => this.onStatsLoad()}>Stats
+                            </button>
                         </div>
                     </div>
                 </div>
