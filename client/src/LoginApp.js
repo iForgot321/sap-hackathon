@@ -109,7 +109,7 @@ class LoginApp extends Component {
             <div className="LoginCard card-body p-4">
               <h3 className="fw-bolder mb-3">Check yourself in</h3>
               <form onSubmit={this.logIn}>
-                <label for="company-email" className="form-label">Company Email</label>
+                <label htmlFor="company-email" className="form-label">Company Email</label>
                 <input
                     type="text"
                     name="text"

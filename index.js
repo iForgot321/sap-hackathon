@@ -2,7 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 
-const {createDatabase, createTables, login, getOffices, logout, getOfficeUsers, getAmenities, joinAmenity, getUser, leaveAmenity} = require("./database");
+const {createDatabase, createTables, login, getOffices, logout, getOfficeUsers, getAmenities, joinAmenity, getUser, leaveAmenity, getAmenityLogs,
+  getAmenityTopUsers,
+  getAmenity
+} = require("./database");
+
+const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
 createDatabase().then((result) => {
   if (result) {
@@ -102,13 +107,24 @@ app.post('/api/amenities/login/:amenity', cors(), async(req, res, next) => {
   const amenity = req.params.amenity;
   const user_id = req.body.uname;
 
-  joinAmenity(user_id, amenity).then((result) => {
-    if (result) {
-      res.json({success: true});
-    } else {
+  getAmenity(amenity).then((result) => {
+    if (result === undefined) {
       res.json({success: false, message: "Database Error"});
+      return;
     }
-  });
+
+    if (result.rowCount === 0 || result.rows[0] === 0 || result.rows[0] > result.rowCount) {
+      joinAmenity(user_id, amenity).then((result2) => {
+        if (result2) {
+          res.json({success: true});
+        } else {
+          res.json({success: false, message: "Database Error"});
+        }
+      });
+    } else {
+      res.json({success: false, message: "Capacity Reached"});
+    }
+  })
 });
 
 app.post('/api/logout', cors(), async(req, res, next) => {
@@ -203,17 +219,45 @@ app.get('/api/online/:office', cors(), async(req, res, next) => {
 });
 
 app.get('/api/amenities/stats/:amenity', cors(), async(req, res, next) => {
-  const body = {
-    success: true,
-    lastUsedTime: "Sat January 1, 2023",
-    lastUsedUser: 'John Doe',
-    popularDay: 'Wednesday',
-    topUsers: [
-      "Test One",
-      "Test Two",
-      "Peiyan Yang"
-    ]
-  }
+  const amenity = req.params.amenity;
+  getAmenityLogs(amenity).then((result) => {
+    if (result === undefined) {
+      res.json({success: false, message: "Database Error"});
+      return;
+    }
+
+    if (result.rowCount === 0) {
+      res.json({success: true, statsFound: false});
+      return;
+    }
+
+    getAmenityTopUsers(amenity).then((result2) => {
+      if (result2 === undefined) {
+        res.json({success: false, message: "Database Error"});
+        return;
+      }
+
+      const map = [0, 0, 0, 0, 0, 0, 0];
+      let maxIndex = 0;
+      result.rows.forEach((value) => {
+        const day = new Date(value).getDay();
+        if (++map[day] > map[maxIndex]) {
+          maxIndex = day;
+        }
+      });
+
+      const body = {
+        success: true,
+        statsFound: true,
+        lastUsedTime: result.rows[0].date,
+        lastUsedUser: result.rows[0].name,
+        popularDay: weekday[maxIndex],
+        topUsers: result2.rows.map(val => val.name)
+      };
+
+      res.json(body);
+    });
+  });
 });
 
 // Anything that doesn't match the above, send back the index.html file

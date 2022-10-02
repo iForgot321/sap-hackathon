@@ -44,7 +44,7 @@ const userTable = `
     CREATE TABLE IF NOT EXISTS "users" (
 	    "name" VARCHAR(100),
 	    "user_id" VARCHAR(100) NOT NULL,
-        "picture_url" VARCHAR(100),
+        "picture_url" VARCHAR(500),
         "amenity_id" INT,
         "office_id" VARCHAR(100),
 	    PRIMARY KEY (user_id),
@@ -79,7 +79,7 @@ const amenityTable = `
 	    "amenity_id" INT GENERATED ALWAYS AS IDENTITY,
 	    "name" VARCHAR(100) NOT NULL,
         "room_id" INT,
-        "image_url" VARCHAR(100),
+        "image_url" VARCHAR(500),
         "capacity" INT NOT NULL,
 	    PRIMARY KEY (amenity_id),
         CONSTRAINT fk_room
@@ -260,6 +260,22 @@ module.exports.getAmenities = async (office) => {
     }
 }
 
+module.exports.getAmenity = async (amenity) => {
+    const clientDB = await pool.connect();
+    try {
+        console.log("getting amenity " + amenity);
+        const query = `SELECT capacity FROM amenities a RIGHT JOIN users u on a.amenity_id = u.amenity_id WHERE a.amenity_id=${amenity};`;
+        console.log(query);
+        const result = await clientDB.query(query);
+        return result;
+    } catch (error) {
+        console.error(error.stack);
+        return undefined;
+    } finally {
+        clientDB.release();
+    }
+}
+
 module.exports.joinAmenity = async (user_id, amenity) => {
     const clientDB = await pool.connect();
     try {
@@ -312,8 +328,36 @@ module.exports.getUser = async (user_id) => {
     }
 }
 
-module.exports.getAmenityStatistics = async (amenity) => {
+module.exports.getAmenityLogs = async (amenity) => {
+    const clientDB = await pool.connect();
+    try {
+        console.log("getting amenities statistics " + amenity);
+        const query = `SELECT u.name as name, a.date as date FROM activity_log a LEFT JOIN users u ON a.user_id=u.user_id WHERE a.amenity_id='${amenity}' ORDER BY a.log_id DESC`;
+        console.log(query);
+        const result = await clientDB.query(query);
+        return result;
+    } catch (error) {
+        console.error(error.stack);
+        return undefined;
+    } finally {
+        clientDB.release();
+    }
+}
 
+module.exports.getAmenityTopUsers = async (amenity) => {
+    const clientDB = await pool.connect();
+    try {
+        console.log("getting amenities statistics " + amenity);
+        const query = `SELECT u.name as name, COUNT(*) as count FROM activity_log a LEFT JOIN users u ON a.user_id=u.user_id WHERE a.amenity_id='${amenity}' GROUP BY u.user_id ORDER BY count DESC LIMIT 3;`;
+        console.log(query);
+        const result = await clientDB.query(query);
+        return result;
+    } catch (error) {
+        console.error(error.stack);
+        return undefined;
+    } finally {
+        clientDB.release();
+    }
 }
 
 
