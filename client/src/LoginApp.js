@@ -104,25 +104,33 @@ class LoginApp extends Component {
       return (
         <div className="LoginApp">
           <h3>Hey, Are You Finished With That?</h3>
-          <form onSubmit={this.logIn}>
-            <input
-              type="text"
-              name="text"
-              className="form-control my-3"
-              placeholder="Company Email"
-              value={this.state.text}
-              onChange={this.handleChange}
-            />
-            <select className="form-select mb-3" name="office" onChange={this.handleChange}>
-              {
-                this.state.possibleOffices.map((name) => <option value={name} key={name}>{name}</option>)
-              }
-            </select>
-            <button className="btn btn-primary mb-3" type="submit">
-              <i className="bi bi-door-open me-2"></i>
-              Check in
-            </button>
-          </form>
+          <div className="card my-5 w-50">
+            <div className="LoginCard card-body p-4">
+              <h3 className="fw-bolder mb-3">Check yourself in</h3>
+              <form onSubmit={this.logIn}>
+                <label for="company-email" className="form-label">Company Email</label>
+                <input
+                    type="text"
+                    name="text"
+                    id="company-email"
+                    className="form-control mb-3"
+                    placeholder="first.last@sap.com"
+                    value={this.state.text}
+                    onChange={this.handleChange}
+                />
+                <label htmlFor="office" className="form-label">Office</label>
+                <select className="form-select mb-3" id="office" name="office" onChange={this.handleChange}>
+                  {
+                    this.state.possibleOffices.map((name) => <option value={name} key={name}>{name}</option>)
+                  }
+                </select>
+                <button className="btn btn-primary" type="submit" disabled={!this.state.text}>
+                  <i className="bi bi-door-open me-2"></i>
+                  Check in
+                </button>
+              </form>
+            </div>
+          </div>
           <p className="text-danger">{this.state.error}</p>
         </div>
       );
