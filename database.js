@@ -86,6 +86,21 @@ const amenityTable = `
                 REFERENCES rooms(room_id)
     );`;
 
+const logTable = `
+    CREATE TABLE IF NOT EXISTS "activity_log" (
+	    "log_id" INT GENERATED ALWAYS AS IDENTITY,
+	    "amenity_id" INT NOT NULL,
+	    "user_id" VARCHAR(100) NOT NULL,
+	    "date" DATE NOT NULL DEFAULT CURRENT_DATE,
+	    PRIMARY KEY (log_id),
+        CONSTRAINT fk_amenity_log
+            FOREIGN KEY(amenity_id)
+                REFERENCES amenities(amenity_id),
+        CONSTRAINT fk_user_log
+            FOREIGN KEY(user_id)
+                REFERENCES users(user_id)
+    );`;
+
 module.exports.createTables = async () => {
     console.log("Creating tables...");
     const clientDB = await pool.connect();
@@ -111,6 +126,10 @@ module.exports.createTables = async () => {
     });
     await clientDB.query(userTable).catch(err => {
         console.log("userTable error");
+        console.error(err.stack);
+    });
+    await clientDB.query(logTable).catch(err => {
+        console.log("logTable error");
         console.error(err.stack);
     });
     console.log('+++++ All tables exist or were successfully created');
