@@ -103,7 +103,7 @@ class LoginApp extends Component {
     if (!this.state.loggedIn) {
       return (
         <div className="LoginApp">
-          <h3>Hey, Are You Finished With That?</h3>
+          <h3>Got Room For One More?</h3>
           <div className="card my-5 w-50">
             <div className="LoginCard card-body p-4">
               <h3 className="fw-bolder mb-3">Check yourself in</h3>
