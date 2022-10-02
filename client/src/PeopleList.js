@@ -69,7 +69,7 @@ class Person extends Component {
     const defaultProfilePicture = "https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg";
     const person = this.props.person;
     let smallText;
-    if (person.room === undefined) {
+    if (!person.room) {
       smallText = <div/>
     } else {
       smallText = <small>Find them in <strong>{person.room}</strong></small>
