@@ -122,7 +122,6 @@ app.post('/api/amenities/login/:amenity', cors(), async(req, res, next) => {
       });
     } else {
       res.json({success: false, message: "Capacity Reached"});
-      return;
     }
   })
 });
