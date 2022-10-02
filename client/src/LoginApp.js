@@ -88,6 +88,10 @@ class LoginApp extends Component {
     }
   };
 
+  refresh = async evt => {
+    this.forceUpdate();
+  }
+
   handleChange = evt => {
     this.setState({[evt.target.name]: evt.target.value});
     if (evt.target.name === "text") {
@@ -127,14 +131,22 @@ class LoginApp extends Component {
         <div className="MainPage">
           <div className="parallax position-relative">
             <div className="heading">
-              <div className="d-flex flex-row vw-100 px-5 justify-content-between">
+              <div className="d-flex flex-row vw-100 px-5 justify-content-between align-items-center">
                 <h2 className="py-4">Hey {this.state.name}, welcome to the SAP {this.state.office} office!</h2>
-                <form onSubmit={this.logOut}>
-                  <button className="btn btn-danger" type="submit">
-                    <i className="bi bi-door-open-fill me-2"></i>
-                    Check out
-                  </button>
-                </form>
+                <div className="d-flex flex-row gap-4">
+                  <form onSubmit={this.refresh}>
+                    <button className="btn btn-primary" type="submit">
+                      <i className="bi bi-arrow-clockwise me-2"></i>
+                      Refresh
+                    </button>
+                  </form>
+                  <form onSubmit={this.logOut}>
+                    <button className="btn btn-danger" type="submit">
+                      <i className="bi bi-door-open-fill me-2"></i>
+                      Check out
+                    </button>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
