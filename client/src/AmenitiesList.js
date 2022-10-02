@@ -55,7 +55,17 @@ class AmenitiesList extends Component {
         const searchString = this.state.searchString;
         const availability = this.state.availability;
 
-        const filteredByName = this.state.amenities.filter((amenity) => {
+        const amenities = [...this.state.amenities];
+
+        // Take out pinned amenity
+        const indexOfCurrent = amenities.findIndex(amenity => amenity.people.some(person => person.email === this.props.uname));
+        const pinnedAmenities = [];
+        if (indexOfCurrent >= 0){
+            pinnedAmenities.push(amenities[indexOfCurrent]);
+            amenities.splice(indexOfCurrent, 1);
+        }
+
+        const filteredByName = amenities.filter((amenity) => {
             return !searchString || amenity.name.toLowerCase().includes(searchString.toLowerCase());
         });
         const filteredByAvailability = filteredByName.filter((amenity) => {
@@ -80,8 +90,8 @@ class AmenitiesList extends Component {
                         onChange={(evt) => this.setState({availability: evt.target.value})}
                     >
                         <option value={""}>- Availability -</option>
-                        <option value={"available"}>Full</option>
-                        <option value={"unavailable"}>Not yet full</option>
+                        <option value={"available"}>Not yet full</option>
+                        <option value={"unavailable"}>Full</option>
                     </select>
                     <input
                         className="form-control"
@@ -94,10 +104,29 @@ class AmenitiesList extends Component {
                 <div className="px-3 py-2 overflow-scroll" style={{height: "30em"}}>
                     <div>
                         {
+                            pinnedAmenities.map((amenity) => (
+                                <Amenity
+                                    key={amenity.id}
+                                    amenity={amenity}
+                                    here={true}
+                                    uname={this.props.uname}
+                                    callback={(json) => this.updateFromResponse(json)}
+                                    prelogcallback={async () => await this.preLogin(amenity)}
+                                    preoutcallback={() => this.preLogout()}
+                                />
+                            ))
+                        }
+                        {
                             finalAmenitiesList.map((amenity) => (
-                                <Amenity key={amenity.id} amenity={amenity} here={
-                                    amenity['people'].findIndex(person => person.email === this.props.uname) >= 0
-                                } uname={this.props.uname} callback={(json) => this.updateFromResponse(json)} prelogcallback={async () => await this.preLogin(amenity)} preoutcallback={() => this.preLogout()}/>
+                                <Amenity
+                                    key={amenity.id}
+                                    amenity={amenity}
+                                    here={false}
+                                    uname={this.props.uname}
+                                    callback={(json) => this.updateFromResponse(json)}
+                                    prelogcallback={async () => await this.preLogin(amenity)}
+                                    preoutcallback={() => this.preLogout()}
+                                />
                             ))
                         }
                     </div>
