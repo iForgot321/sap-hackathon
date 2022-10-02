@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 
-const {createDatabase, createTables, login, getOffices, logout, getOfficeUsers, getAmenities, joinAmenity, getUser} = require("./database");
+const {createDatabase, createTables, login, getOffices, logout, getOfficeUsers, getAmenities, joinAmenity, getUser, leaveAmenity} = require("./database");
 
 createDatabase().then((result) => {
   if (result) {
@@ -21,63 +21,6 @@ const bodyParser = require('body-parser');
 // Create the server
 const app = express();
 
-//const offices = ["Vancouver", "Vancouver, Washington"];
-let amenities = [
-  {
-    'id': 1,
-    'name': 'Pool Table 1',
-    'room': 'Game Room',
-    'image': 'https://www.homestratosphere.com/wp-content/uploads/2018/05/game-room-billiards-table-may16-2018.jpg',
-    'capacity': 2,
-    'people': [
-      {
-        'email': 'abc@company.com',
-        'name': 'Jane Doe',
-        'image': 'https://images.pexels.com/photos/2381069/pexels-photo-2381069.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
-      }, {
-        'email': 'def@company.com',
-        'name': 'John Smith',
-        'image': 'https://thumbs.dreamstime.com/b/profile-picture-caucasian-male-employee-posing-office-happy-young-worker-look-camera-workplace-headshot-portrait-smiling-190186649.jpg',
-      }
-    ],
-  },
-  {
-    'id': 2,
-    'name': 'Pool Table 2',
-    'room': 'Game Room',
-    'image': 'https://www.homestratosphere.com/wp-content/uploads/2018/05/game-room-billiards-table-may16-2018.jpg',
-    'capacity': 2,
-    'people': [],
-  },
-  {
-    'id': 3,
-    'name': 'Treadmill',
-    'room': 'Gym',
-    'image': 'https://www.yanrefitness.com/wp-content/webpc-passthru.php?src=https://www.yanrefitness.com/wp-content/uploads/2020/09/How-to-Start-a-Corporate-Gym-1.jpg&nocache=1',
-    'capacity': 1,
-    'people': [
-      {
-        'email': '111@company.com',
-        'name': 'Jane Smith',
-        'image': 'https://thumbs.dreamstime.com/b/profile-picture-caucasian-male-employee-posing-office-happy-young-worker-look-camera-workplace-headshot-portrait-smiling-190186649.jpg',
-      }
-    ],
-  },
-  {
-    'id': 4,
-    'name': 'Ping Pong Table 1',
-    'room': 'Gym',
-    // 'image': 'https://www.yanrefitness.com/wp-content/webpc-passthru.php?src=https://www.yanrefitness.com/wp-content/uploads/2020/09/How-to-Start-a-Corporate-Gym-1.jpg&nocache=1',
-    'capacity': 2,
-    'people': [
-      {
-        'email': '112@company.com',
-        'name': 'Jane Doe',
-        'image': 'https://images.pexels.com/photos/2381069/pexels-photo-2381069.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
-      },
-    ],
-  },
-];
 
 // Serve static files from the React frontend app
 app.use(express.static(path.join(__dirname, 'client/build')));
@@ -181,7 +124,7 @@ app.post('/api/logout', cors(), async(req, res, next) => {
 app.post('/api/amenities/logout/:amenity', cors(), async(req, res, next) => {
   const user_id = req.body.uname;
 
-  joinAmenity(user_id).then((result) => {
+  leaveAmenity(user_id).then((result) => {
     if (result) {
       res.json({success: true});
     } else {
