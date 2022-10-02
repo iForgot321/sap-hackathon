@@ -252,9 +252,13 @@ module.exports.joinAmenity = async (user_id, amenity) => {
     const clientDB = await pool.connect();
     try {
         console.log("user " + user_id + " joining amenity " + amenity);
-        const query2 = 'UPDATE users SET amenity_id=\'' + amenity + '\' WHERE user_id=\''+user_id+'\';';
+        const query = 'UPDATE users SET amenity_id=\'' + amenity + '\' WHERE user_id=\''+user_id+'\';';
+        console.log(query);
+        await clientDB.query(query);
+
+        const query2 = `INSERT INTO activity_log (amenity_id, user_id, date) VALUES (${amenity}, '${user_id}', $1);`;
         console.log(query2);
-        await clientDB.query(query2);
+        await clientDB.query(query2, [new Date()]);
         return true;
     } catch (error) {
         console.error(error.stack);
@@ -267,17 +271,10 @@ module.exports.joinAmenity = async (user_id, amenity) => {
 module.exports.leaveAmenity = async (user_id) => {
     const clientDB = await pool.connect();
     try {
-        console.log("user " + user_id + " leaving amenity");
-
-        const query = 'UPDATE users SET amenity_id=NULL FROM (SELECT amenity_id FROM users WHERE user_id=\''+user_id+'\' FOR UPDATE) old_users WHERE user_id=\''+user_id+'\' RETURNING old_users.amenity_id;';
-        console.log(query);
-        const queryResult = await clientDB.query(query);
-        const amenity_id = queryResult.rows[0].amenity_id;
-        console.log('user has left amenity ' + amenity_id);
-
-        const query2 = `INSERT INTO activity_log (amenity_id, user_id, date) VALUES (${amenity_id}, '${user_id}', $1);`;
+        console.log("user " + user_id + " leaving amentity");
+        const query2 = 'UPDATE users SET amenity_id=NULL WHERE user_id=\''+user_id+'\';';
         console.log(query2);
-        await clientDB.query(query2, [new Date()]);
+        await clientDB.query(query2);
         return true;
     } catch (error) {
         console.error(error.stack);
