@@ -44,7 +44,7 @@ const userTable = `
     CREATE TABLE IF NOT EXISTS "users" (
 	    "name" VARCHAR(100),
 	    "user_id" VARCHAR(100) NOT NULL,
-        "picture_url" VARCHAR(100),
+        "picture_url" VARCHAR(500),
         "amenity_id" INT,
         "office_id" VARCHAR(100),
 	    PRIMARY KEY (user_id),
@@ -78,7 +78,7 @@ const amenityTable = `
 	    "amenity_id" INT GENERATED ALWAYS AS IDENTITY,
 	    "name" VARCHAR(100) NOT NULL,
         "room_id" INT,
-        "image_url" VARCHAR(100),
+        "image_url" VARCHAR(500),
         "capacity" INT NOT NULL,
 	    PRIMARY KEY (amenity_id),
         CONSTRAINT fk_room
