@@ -208,7 +208,7 @@ class Amenity extends Component {
                         }
                         <img
                             src={imageSrc}
-                            className="img-fluid rounded-start"
+                            className="img-fluid h-100 rounded-start"
                             alt={`Photo of ${amenity.name}`}
                         />
                     </div>
