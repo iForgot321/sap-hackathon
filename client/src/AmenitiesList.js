@@ -9,10 +9,6 @@ class AmenitiesList extends Component {
     };
 
     async componentDidMount() {
-        const response = await fetch('/api/amenities/stats/4');
-        const responseJson = await response.json();
-        console.log(responseJson);
-
         await this.fetchAmenities();
     }
 
@@ -251,10 +247,6 @@ class Amenity extends Component {
                                         <span className="badge text-bg-success ms-2">Full</span>
                                     }
                                 </h5>
-
-                                <button className="btn btn-primary" type="button" data-bs-toggle="offcanvas"
-                                        data-bs-target="#amenitystats" aria-controls="amenitystats" onClick={() => this.onStatsLoad()}>Stats
-                                </button>
                                 {
                                     here ?
                                         <button className="btn btn-danger" onClick={() => this.onLogout(amenity)}>Tap out
