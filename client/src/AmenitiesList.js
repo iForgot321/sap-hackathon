@@ -173,7 +173,7 @@ class Amenity extends Component {
     async onStatsLoad() {
         const response = await fetch('/api/amenities/stats/' + this.props.amenity['id']);
         const json = await response.json();
-        if (json.success) {
+        if (json.success && json.statsFound) {
             this.setState({
                 lastUsedTime: json.lastUsedTime,
                 lastUsedUser: json.lastUsedUser,
@@ -187,7 +187,7 @@ class Amenity extends Component {
                 lastUsedUser: '',
                 popularDay: '',
                 topUsers: [],
-                error: "Database error"
+                error: json.success ? "No statistics found" : "Database error"
             })
         }
     }
