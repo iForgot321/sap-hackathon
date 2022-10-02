@@ -1,19 +1,41 @@
 const { Client, Pool } = require('pg');
 
-const config = {
-    user: 'postgres', // name of the user account
-    database: 'sapdb', // name of the database
-    max: 10, // max number of clients in the pool
-    idleTimeoutMillis: 30000
-}
-const pool = new Pool(config);
+const databaseFromConfig = process.env.DATABASE_URL;
+const heroku = !!databaseFromConfig;
 
-const client = new Client({
-    host: '127.0.0.1',
-    user: 'postgres',
-    password: '',
-    port: 5432,
-});
+let client = null;
+let pool = null;
+let dbname = heroku ? databaseFromConfig.split('/').pop() : 'sapdb';
+if (heroku) {
+    client = new Client({
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+            rejectUnauthorized: false
+        }
+    });
+    pool = new Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+            rejectUnauthorized: false
+        },
+        database: dbname, // name of the database
+        max: 10, // max number of clients in the pool
+        idleTimeoutMillis: 30000
+    });
+} else {
+    client = new Client({
+        host: '127.0.0.1',
+        user: 'postgres',
+        password: '',
+        port: 5432,
+    });
+    pool = new Pool({
+        user: 'postgres', // name of the user account
+        database: dbname, // name of the database
+        max: 10, // max number of clients in the pool
+        idleTimeoutMillis: 30000
+    });
+}
 
 const userTable = `
     CREATE TABLE IF NOT EXISTS "users" (
@@ -95,10 +117,14 @@ module.exports.createTables = async () => {
 };
 
 module.exports.createDatabase = async () => {
+    if (heroku) {
+        return true;
+    }
+
     try {
         console.log("Creating database...");
         await client.connect();                            // gets connection
-        await client.query('CREATE DATABASE sapdb'); // sends queries
+        await client.query(`CREATE DATABASE ${dbname}`); // sends queries
         return true;
     } catch (error) {
         if (error.stack.includes("already exists")) {
