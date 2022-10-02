@@ -1,19 +1,40 @@
 const { Client, Pool } = require('pg');
 
-const config = {
-    user: 'postgres', // name of the user account
-    database: 'sapdb', // name of the database
-    max: 10, // max number of clients in the pool
-    idleTimeoutMillis: 30000
-}
-const pool = new Pool(config);
+const databaseFromConfig = process.env.DATABASE_URL;
 
-const client = new Client({
-    host: '127.0.0.1',
-    user: 'postgres',
-    password: '',
-    port: 5432,
-});
+
+let client = null;
+let pool = null;
+if (databaseFromConfig) {
+    client = new Client({
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+            rejectUnauthorized: false
+        }
+    });
+    pool = new Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+            rejectUnauthorized: false
+        },
+        database: 'sapdb', // name of the database
+        max: 10, // max number of clients in the pool
+        idleTimeoutMillis: 30000
+    });
+} else {
+    client = new Client({
+        host: '127.0.0.1',
+        user: 'postgres',
+        password: '',
+        port: 5432,
+    });
+    pool = new Pool({
+        user: 'postgres', // name of the user account
+        database: 'sapdb', // name of the database
+        max: 10, // max number of clients in the pool
+        idleTimeoutMillis: 30000
+    });
+}
 
 const userTable = `
     CREATE TABLE IF NOT EXISTS "users" (
