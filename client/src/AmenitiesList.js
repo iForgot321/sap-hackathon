@@ -193,31 +193,6 @@ class Amenity extends Component {
         const here = this.props.here;
         const canTapIn = amenity.people.length < amenity.capacity;
         const imageSrc = amenity.image ? amenity.image : 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/681px-Placeholder_view_vector.svg.png';
-        let offcanvas;
-        if (this.state.error !== '') {
-            offcanvas = <div>
-                <p className="text-danger">{this.state.error}</p>
-            </div>;
-        } else {
-            let displayString = this.state.lastUsedTime;
-            let split = this.state.lastUsedTime.split("T")[0].split("-");
-            let last = new Date(parseInt(split[0]),parseInt(split[1])-1,parseInt(split[2]));
-            let now = new Date(new Date().toDateString());
-            if (now - last === 0) {
-                displayString = 'Today';
-            } else if (now - last === 1000*60*60*24) {
-                displayString = "Yesterday";
-            }
-            offcanvas =<div>
-                <p>Last day used: {displayString}</p>
-                <p>Last user: {this.state.lastUsedUser}</p>
-                <p>Most popular day: {this.state.popularDay}</p>
-                <p>Top Users: </p>
-                <p>  1:  {this.state.topUsers[0]}</p>
-                <p>  2:  {this.state.topUsers[1]}</p>
-                <p>  3:  {this.state.topUsers[2]}</p>
-            </div>;
-        }
 
         return (
             <div className="ItemCard card my-3 w-100">
@@ -262,22 +237,116 @@ class Amenity extends Component {
                             <h6 className="card-subtitle mb-2 fw-normal">Located in: {amenity.room}</h6>
                             <CurrentUsage people={amenity.people} />
                             <br/>
-                            <button className="btn btn-secondary btn-sm" type="button" data-bs-toggle="offcanvas"
-                                    data-bs-target={"#amenitystats" + this.props.amenity.id} aria-controls="amenitystats" onClick={() => this.onStatsLoad()}>Stats
+                            <button className="btn btn-secondary" type="button" data-bs-toggle="offcanvas"
+                                    data-bs-target={"#amenitystats" + amenity.id} aria-controls="amenitystats" onClick={() => this.onStatsLoad()}>
+                                More info
+                                <i className="bi bi-chevron-right ms-2"></i>
                             </button>
                         </div>
                     </div>
                 </div>
+                <StatsOffcanvas
+                    error={this.state.error}
+                    amenity={amenity}
+                    lastUsedTime={this.state.lastUsedTime}
+                    lastUsedUser={this.state.lastUsedUser}
+                    topUsers={this.state.topUsers}
+                    popularDay={this.state.popularDay}
+                />
+            </div>
+        );
+    }
+}
 
-                <div className="offcanvas offcanvas-end" tabIndex="-1" id={"amenitystats" + this.props.amenity.id}>
+class StatsOffcanvas extends Component {
+    render() {
+        const amenity = this.props.amenity;
+
+        if (this.props.error) {
+            return (
+                <div className="offcanvas offcanvas-end" tabIndex="-1" id={"amenitystats" + amenity.id}>
                     <div className="offcanvas-header">
-                        <h5 className="offcanvas-title" id="offcanvasRightLabel">Amenity statistics</h5>
-                        <button type="button" className="btn-close" data-bs-dismiss="offcanvas"
-                                aria-label="Close"></button>
+                        <div>
+                            <h4 className="offcanvas-title" id="offcanvasRightLabel">
+                                {amenity.name}
+                            </h4>
+                        </div>
                     </div>
+                    {
+                        amenity.image ?
+                            <img src={amenity.image}
+                                 className="img-fluid"
+                                 alt={`Photo of ${amenity.name}`}/> : <hr className="m-0"/>
+                    }
                     <div className="offcanvas-body">
-                        {offcanvas}
+                        <div className="alert alert-danger">
+                            {this.props.error}
+                        </div>
                     </div>
+                </div>
+            );
+        }
+
+        let displayString = this.props.lastUsedTime;
+        let split = this.props.lastUsedTime.split("T")[0].split("-");
+        let last = new Date(parseInt(split[0]),parseInt(split[1])-1,parseInt(split[2]));
+        let now = new Date(new Date().toDateString());
+        if (now - last === 0) {
+            displayString = "today";
+        } else if (now - last === 1000*60*60*24) {
+            displayString = "yesterday";
+        }
+
+        return (
+            <div className="offcanvas offcanvas-end" tabIndex="-1" id={"amenitystats" + amenity.id}>
+                <div className="offcanvas-header">
+                    <div>
+                        <h4 className="offcanvas-title" id="offcanvasRightLabel">
+                            {amenity.name}
+                        </h4>
+                        <p className="text-secondary mb-0">
+                            Last used <b>{displayString}</b> by <b>{this.props.lastUsedUser}</b>
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        className="btn-close"
+                        data-bs-dismiss="offcanvas"
+                        aria-label="Close"
+                    />
+                </div>
+                {
+                    amenity.image ?
+                    <img src={amenity.image}
+                         className="img-fluid"
+                         alt={`Photo of ${amenity.name}`}/> : <hr className="m-0"/>
+                }
+                <div className="offcanvas-body">
+                    {
+                        this.props.popularDay &&
+                        <div>
+                            <h5>Most popular day</h5>
+                            <div className="card shadow-sm">
+                                <div className="card-body py-2 px-3 fs-5">
+                                    {this.props.popularDay}
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <hr/>
+                    <h5 className="mb-3">Top users</h5>
+                    {
+                        this.props.topUsers.map((user, index) => (
+                            <div className={"card shadow-sm mb-2" + (index ? " HighlightedRest" : " HighlightedFirst")} key={user}>
+                                <div className="card-body d-flex flex-row align-items-center py-2 px-3 fs-5">
+                                    <span className={"badge me-3" + (index ? " bg-secondary" : " bg-success")}>
+                                        {index + 1}
+                                    </span>
+                                    {user}
+                                </div>
+                            </div>
+                        ))
+                    }
                 </div>
             </div>
         );
