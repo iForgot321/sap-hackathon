@@ -4,7 +4,7 @@ import './AmenitiesList.css';
 class AmenitiesList extends Component {
     state = {
         amenities: [],
-        availability: "",
+        availability: "available",
         searchString: "",
     };
 
@@ -91,7 +91,7 @@ class AmenitiesList extends Component {
                         value={availability}
                         onChange={(evt) => this.setState({availability: evt.target.value})}
                     >
-                        <option value={""}>- Availability -</option>
+                        <option value={""}>All</option>
                         <option value={"available"}>Full</option>
                         <option value={"unavailable"}>Not yet full</option>
                     </select>
@@ -173,7 +173,8 @@ class Amenity extends Component {
                         <img
                             src={imageSrc}
                             className="img-fluid rounded-start"
-                            alt={`Photo of ${amenity.name}`} />
+                            alt={`Photo of ${amenity.name}`}
+                        />
                     </div>
                     <div className="col-md-8">
                         <div className="card-body">
