@@ -6,10 +6,22 @@ class AmenitiesList extends Component {
         amenities: [],
         availability: "available",
         searchString: "",
+        updateTimer: 0,
     };
 
     async componentDidMount() {
+        // Queue up calls
+        const timer = setInterval(async () => {
+            await this.fetchAmenities();
+        }, 5 * 1000);
+        this.setState({updateTimer: timer});
+
+        // First call
         await this.fetchAmenities();
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.state.updateTimer);
     }
 
     async updateFromResponse(res) {
