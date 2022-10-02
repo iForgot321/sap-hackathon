@@ -1,4 +1,6 @@
 const { Client, Pool } = require('pg');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const databaseFromConfig = process.env.DATABASE_URL;
 const heroku = !!databaseFromConfig;
@@ -26,11 +28,12 @@ if (heroku) {
     client = new Client({
         host: '127.0.0.1',
         user: 'postgres',
-        password: '',
+        password: process.env.DATABASE_PASS ?? '',
         port: 5432,
     });
     pool = new Pool({
         user: 'postgres', // name of the user account
+        password: process.env.DATABASE_PASS ?? '',
         database: dbname, // name of the database
         max: 10, // max number of clients in the pool
         idleTimeoutMillis: 30000
