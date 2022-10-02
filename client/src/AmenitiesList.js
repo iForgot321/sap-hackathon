@@ -202,11 +202,11 @@ class Amenity extends Component {
                                 </h5>
                                 {
                                     here ?
-                                        <button className="btn btn-sm btn-danger" onClick={() => this.onLogout(amenity)}>Tap out
+                                        <button className="btn btn-danger" onClick={() => this.onLogout(amenity)}>Tap out
                                             <i className="bi bi-box-arrow-right ms-1"></i>
                                         </button> :
                                         canTapIn ?
-                                            <button className="btn btn-sm btn-primary" onClick={() => this.onLogin(amenity)}>Tap in
+                                            <button className="btn btn-primary" onClick={() => this.onLogin(amenity)}>Tap in
                                                 <i className="bi bi-box-arrow-in-right ms-1"></i>
                                             </button> :
                                             null
