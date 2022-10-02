@@ -69,7 +69,7 @@ class AmenitiesList extends Component {
         const availability = this.state.availability;
 
         // Always include the tapped-in amenity in the list
-        const filteredByName = this.state.amenities.filter((amenity) => {
+        const filteredByName = this.state.amenities.map((amenity, index) => {return {...amenity, index: index}}).filter((amenity) => {
             return amenity.here || !searchString || amenity.name.toLowerCase().includes(searchString.toLowerCase());
         });
         const filteredByAvailability = filteredByName.filter((amenity) => {
@@ -112,8 +112,8 @@ class AmenitiesList extends Component {
                 <div className="px-3 py-2 overflow-scroll" style={{height: "30em"}}>
                     <div>
                         {
-                            finalAmenitiesList.map((amenity, index) => (
-                                <Amenity index={index} key={amenity.id} amenity={amenity} here={amenity.here} uname={this.props.uname} callback={(res) => this.updateFromResponse(res)}/>
+                            finalAmenitiesList.map((amenity) => (
+                                <Amenity key={amenity.id} amenity={amenity} here={amenity.here} uname={this.props.uname} callback={(res) => this.updateFromResponse(res)}/>
                             ))
                         }
                     </div>
@@ -139,7 +139,7 @@ class Amenity extends Component {
         const response = await fetch('/api/amenities/logout/' + this.props.amenity['id'], requestOptions);
         const custom = await response.json();
         this.props.callback({
-            index: this.props.index,
+            index: this.props.amenity.index,
             isTapIn: false
         });
     }
@@ -155,7 +155,7 @@ class Amenity extends Component {
         const response = await fetch('/api/amenities/login/' + this.props.amenity['id'], requestOptions);
         const custom = await response.json();
         this.props.callback({
-            index: this.props.index,
+            index: this.props.amenity.index,
             isTapIn: true
         });
     }
